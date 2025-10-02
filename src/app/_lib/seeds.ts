@@ -1,23 +1,23 @@
 import { db } from "@/db/index";
-import { type Task, tasks } from "@/db/schema";
+import { type Order, orders } from "@/db/schema";
 
-import { generateRandomTask } from "./utils";
+import { generateRandomOrder } from "./utils";
 
 export async function seedTasks(input: { count: number }) {
   const count = input.count ?? 100;
 
   try {
-    const allTasks: Task[] = [];
+    const allTasks: Order[] = [];
 
     for (let i = 0; i < count; i++) {
-      allTasks.push(generateRandomTask());
+      allTasks.push(generateRandomOrder(i));
     }
 
-    await db.delete(tasks);
+    await db.delete(orders);
 
     console.log("📝 Inserting tasks", allTasks.length);
 
-    await db.insert(tasks).values(allTasks).onConflictDoNothing();
+    await db.insert(orders).values(allTasks).onConflictDoNothing();
   } catch (err) {
     console.error(err);
   }

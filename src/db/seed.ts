@@ -1,21 +1,38 @@
-import { seedTasks } from "@/app/_lib/seeds";
+import { db } from "@/db/index";
+import { orders } from "@/db/schema";
+import { generateRandomOrder } from "@/app/_lib/utils";
 
-async function runSeed() {
-  console.log("⏳ Running seed...");
+async function seed() {
+  console.log("🌱 Seeding database...");
 
-  const start = Date.now();
+  try {
+    // Clear existing orders
+    await db.delete(orders);
+    console.log("✅ Cleared existing orders");
 
-  await seedTasks({ count: 100 });
+    // Generate and insert orders
+    const orderCount = 100;
+    const allOrders = [];
 
-  const end = Date.now();
+    for (let i = 1; i <= orderCount; i++) {
+      allOrders.push(generateRandomOrder(i));
+    }
 
-  console.log(`✅ Seed completed in ${end - start}ms`);
+    await db.insert(orders).values(allOrders);
+    console.log(`✅ Inserted ${orderCount} orders`);
 
-  process.exit(0);
+    console.log("✨ Seeding complete!");
+  } catch (error) {
+    console.error("❌ Seeding failed:", error);
+    throw error;
+  }
 }
 
-runSeed().catch((err) => {
-  console.error("❌ Seed failed");
-  console.error(err);
-  process.exit(1);
-});
+seed()
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    })
+    .finally(() => {
+      process.exit(0);
+    });

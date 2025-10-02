@@ -1,9 +1,9 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Table",
+  name: "AeroFlow",
   description:
-    "Shadcn table with server side sorting, pagination, and filtering",
-  url: "https://tablecn.com",
-  links: { github: "https://github.com/sadmann7/tablecn" },
+    "Hissan AeroFlow New Interactive Tables",
+  url: "https://hissan-aero.com",
+  links: { github: "https://github.com/cosmicsarthak" },
 };
