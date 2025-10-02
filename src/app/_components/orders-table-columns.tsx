@@ -309,7 +309,7 @@ export function getOrdersTableColumns({
                                             startUpdateTransition(() => {
                                                 toast.promise(
                                                     updateOrder({
-                                                        id: row.original.id,
+                                                        sn: row.original.sn,
                                                         status: value as Order["status"],
                                                     }),
                                                     {

@@ -1,14 +1,9 @@
 import { sql } from "drizzle-orm";
-import { integer, real, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import {integer, real, serial, text, timestamp, varchar} from "drizzle-orm/pg-core";
 import { pgTable } from "@/db/utils";
 
-import { generateId } from "@/lib/id";
-
 export const orders = pgTable("orders", {
-  id: varchar("id", { length: 36 })  // Or { length: 128 } for extra buffer
-      .$defaultFn(() => generateId("order"))
-      .primaryKey(),
-  sn: integer("sn").notNull().unique(),
+  sn: serial("sn").primaryKey(),  // Autoincrements starting from 1 // only for postgreSQL
   partNumber: varchar("part_number", { length: 255 }).notNull(),
   description: text("description").notNull(),
   qty: real("qty").notNull(),

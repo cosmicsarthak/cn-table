@@ -116,12 +116,9 @@ export function generateRandomOrder(sn: number): Order {
   const yesNo = ["Yes", "No"];
 
   const randomElement = <T,>(arr: T[]): T => {
-    // This check handles the case of an empty array.
     if (arr.length === 0) {
       throw new Error("Cannot select a random element from an empty array.");
     }
-
-    // TypeScript now knows the array is not empty and a 'T' will always be returned.
     return arr[Math.floor(Math.random() * arr.length)];
   };
 
@@ -139,7 +136,6 @@ export function generateRandomOrder(sn: number): Order {
   const profitPercent = (grossProfit / poValue) * 100;
 
   return {
-    id: crypto.randomUUID(),
     sn,
     partNumber: randomElement(partNumbers),
     description: randomElement(descriptions),

@@ -63,7 +63,7 @@ export function UpdateOrderSheet({ order, ...props }: UpdateOrderSheetProps) {
             if (!order) return;
 
             const { error } = await updateOrder({
-                id: order.id,
+                sn: order.sn,
                 ...input,
             });
 

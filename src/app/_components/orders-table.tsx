@@ -66,7 +66,7 @@ export function OrdersTable({ promises }: OrdersTableProps) {
             sorting: [{ id: "createdAt", desc: true }],
             columnPinning: { right: ["actions"] },
         },
-        getRowId: (originalRow) => originalRow.id,
+        getRowId: (originalRow) => String(originalRow.sn),
         shallow: false,
         clearOnDefault: true,
     });

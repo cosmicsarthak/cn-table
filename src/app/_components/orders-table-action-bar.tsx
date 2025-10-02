@@ -58,7 +58,7 @@ export function OrdersTableActionBar({ table }: OrdersTableActionBarProps) {
             );
             startTransition(async () => {
                 const { error } = await updateOrders({
-                    ids: rows.map((row) => row.original.id),
+                    sns: rows.map((row) => row.original.sn),
                     [field]: value,
                 });
 
@@ -86,7 +86,7 @@ export function OrdersTableActionBar({ table }: OrdersTableActionBarProps) {
         setCurrentAction("delete");
         startTransition(async () => {
             const { error } = await deleteOrders({
-                ids: rows.map((row) => row.original.id),
+                sns: rows.map((row) => row.original.sn),
             });
 
             if (error) {

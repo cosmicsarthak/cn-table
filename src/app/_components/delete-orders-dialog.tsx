@@ -49,7 +49,7 @@ export function DeleteOrdersDialog({
     function onDelete() {
         startDeleteTransition(async () => {
             const { error } = await deleteOrders({
-                ids: orders.map((order) => order.id),
+                sns: orders.map((order) => order.sn),
             });
 
             if (error) {
