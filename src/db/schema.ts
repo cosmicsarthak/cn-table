@@ -1,19 +1,20 @@
 import { sql } from "drizzle-orm";
-import {integer, real, serial, text, timestamp, varchar} from "drizzle-orm/pg-core";
-import { pgTable } from "@/db/utils";
+import { integer, real, text } from "drizzle-orm/sqlite-core";
+import { sqliteTable } from "@/db/utils";
 
-export const orders = pgTable("orders", {
-  sn: serial("sn").primaryKey(),  // Autoincrements starting from 1 // only for postgreSQL
-  partNumber: varchar("part_number", { length: 255 }).notNull(),
+export const orders = sqliteTable("orders", {
+  // SQLite uses INTEGER PRIMARY KEY for autoincrement
+  sn: integer("sn").primaryKey({ autoIncrement: true }),
+  partNumber: text("part_number").notNull(),
   description: text("description").notNull(),
   qty: real("qty").notNull(),
-  poDate: varchar("po_date", { length: 50 }).notNull(),
-  term: varchar("term", { length: 50 }).notNull(),
-  customer: varchar("customer", { length: 255 }).notNull(),
-  custPo: varchar("cust_po", { length: 255 }).notNull(),
-  status: varchar("status", { length: 255 }).notNull(),
+  poDate: text("po_date").notNull(),
+  term: text("term").notNull(),
+  customer: text("customer").notNull(),
+  custPo: text("cust_po").notNull(),
+  status: text("status").notNull(),
   remarks: text("remarks").notNull().default(""),
-  currency: varchar("currency", { length: 3 }).notNull(),
+  currency: text("currency").notNull(),
   poValue: real("po_value").notNull(),
   costs: real("costs").notNull(),
   customsDutyB: real("customs_duty_b"),
@@ -22,27 +23,26 @@ export const orders = pgTable("orders", {
   profitPercent: real("profit_percent"),
   netProfit: real("net_profit"),
   profitPercentAfterCost: real("profit_percent_after_cost"),
-  paymentReceived: varchar("payment_received", { length: 50 }).notNull(),
-  investorPaid: varchar("investor_paid", { length: 50 }).notNull(),
-  targetDate: varchar("target_date", { length: 50 }).notNull().default(""),
-  dispatchDate: varchar("dispatch_date", { length: 50 }).notNull().default(""),
-  supplierPoDate: varchar("supplier_po_date", { length: 50 }).notNull(),
-  supplier: varchar("supplier", { length: 255 }).notNull(),
-  supplierPo: varchar("supplier_po", { length: 255 }).notNull(),
-  awbToUae: varchar("awb_to_uae", { length: 255 }).notNull().default(""),
-  haInvDate: varchar("ha_inv_date", { length: 50 }).notNull().default(""),
-  haInv: varchar("ha_inv", { length: 255 }).notNull().default(""),
-  anPoDate: varchar("an_po_date", { length: 50 }).notNull().default(""),
-  anPo: varchar("an_po", { length: 255 }).notNull().default(""),
-  anInvDate: varchar("an_inv_date", { length: 50 }).notNull().default(""),
-  anInv: varchar("an_inv", { length: 255 }).notNull().default(""),
-  audited: varchar("audited", { length: 10 }).notNull().default(""),
+  paymentReceived: text("payment_received").notNull(),
+  investorPaid: text("investor_paid").notNull(),
+  targetDate: text("target_date").notNull().default(""),
+  dispatchDate: text("dispatch_date").notNull().default(""),
+  supplierPoDate: text("supplier_po_date").notNull(),
+  supplier: text("supplier").notNull(),
+  supplierPo: text("supplier_po").notNull(),
+  awbToUae: text("awb_to_uae").notNull().default(""),
+  haInvDate: text("ha_inv_date").notNull().default(""),
+  haInv: text("ha_inv").notNull().default(""),
+  anPoDate: text("an_po_date").notNull().default(""),
+  anPo: text("an_po").notNull().default(""),
+  anInvDate: text("an_inv_date").notNull().default(""),
+  anInv: text("an_inv").notNull().default(""),
+  audited: text("audited").notNull().default(""),
   stability: real("stability").notNull(),
-  lastEdited: varchar("last_edited", { length: 50 }).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-      .default(sql`current_timestamp`)
-      .$onUpdate(() => new Date()),
+  lastEdited: text("last_edited").notNull(),
+  // SQLite stores timestamps as TEXT, INTEGER (unix), or REAL
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
 });
 
 export type Order = typeof orders.$inferSelect;

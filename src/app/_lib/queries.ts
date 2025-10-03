@@ -5,11 +5,12 @@ import {
     asc,
     count,
     desc,
-    gt,
     gte,
-    ilike,
     inArray,
+    like,
     lte,
+    max,
+    min,
     sql,
 } from "drizzle-orm";
 import { db } from "@/db";
@@ -35,20 +36,21 @@ export async function getOrders(input: GetOrdersSchema) {
                     joinOperator: input.joinOperator,
                 });
 
+                // SQLite uses LIKE instead of ILIKE (case-insensitive search)
                 const where = advancedTable
                     ? advancedWhere
                     : and(
                         input.partNumber
-                            ? ilike(orders.partNumber, `%${input.partNumber}%`)
+                            ? like(orders.partNumber, `%${input.partNumber}%`)
                             : undefined,
                         input.customer
-                            ? ilike(orders.customer, `%${input.customer}%`)
+                            ? like(orders.customer, `%${input.customer}%`)
                             : undefined,
                         input.supplier
-                            ? ilike(orders.supplier, `%${input.supplier}%`)
+                            ? like(orders.supplier, `%${input.supplier}%`)
                             : undefined,
                         input.custPo
-                            ? ilike(orders.custPo, `%${input.custPo}%`)
+                            ? like(orders.custPo, `%${input.custPo}%`)
                             : undefined,
                         input.status.length > 0
                             ? inArray(orders.status, input.status)
@@ -140,11 +142,14 @@ export async function getOrderStatusCounts() {
                     })
                     .from(orders)
                     .groupBy(orders.status)
-                    .having(gt(count(orders.status), 0))
+                    // SQLite doesn't support HAVING with aggregate comparison the same way
+                    // We'll filter in JS instead
                     .then((res) =>
                         res.reduce(
-                            (acc, { status, count }) => {
-                                acc[status] = count;
+                            (acc, { status, count: cnt }) => {
+                                if (cnt > 0) {
+                                    acc[status] = cnt;
+                                }
                                 return acc;
                             },
                             {} as Record<string, number>,
@@ -172,11 +177,12 @@ export async function getOrderCustomerCounts() {
                     })
                     .from(orders)
                     .groupBy(orders.customer)
-                    .having(gt(count(), 0))
                     .then((res) =>
                         res.reduce(
-                            (acc, { customer, count }) => {
-                                acc[customer] = count;
+                            (acc, { customer, count: cnt }) => {
+                                if (cnt > 0) {
+                                    acc[customer] = cnt;
+                                }
                                 return acc;
                             },
                             {} as Record<string, number>,
@@ -199,11 +205,14 @@ export async function getPoValueRange() {
             try {
                 return await db
                     .select({
-                        min: sql<number>`min(${orders.poValue})`,
-                        max: sql<number>`max(${orders.poValue})`,
+                        min: min(orders.poValue),
+                        max: max(orders.poValue),
                     })
                     .from(orders)
-                    .then((res) => res[0] ?? { min: 0, max: 0 });
+                    .then((res) => ({
+                        min: res[0]?.min ?? 0,
+                        max: res[0]?.max ?? 0,
+                    }));
             } catch (_err) {
                 return { min: 0, max: 0 };
             }

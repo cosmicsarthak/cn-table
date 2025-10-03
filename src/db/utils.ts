@@ -3,7 +3,7 @@
  */
 
 import { type AnyColumn, sql } from "drizzle-orm";
-import { pgTableCreator } from "drizzle-orm/pg-core";
+import { sqliteTableCreator } from "drizzle-orm/sqlite-core";
 
 import { databasePrefix } from "@/lib/constants";
 
@@ -11,7 +11,9 @@ import { databasePrefix } from "@/lib/constants";
  * Allows a single database instance for multiple projects.
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const pgTable = pgTableCreator((name) => `${databasePrefix}_${name}`);
+// export const sqliteTable = sqliteTableCreator((name) => `${databasePrefix}_${name}`);
+export const sqliteTable = sqliteTableCreator((name) => name);
+// This removes the prefix, so "orders" stays as "orders"
 
 export function takeFirstOrNull<TData>(data: TData[]) {
   return data[0] ?? null;
@@ -28,13 +30,14 @@ export function takeFirstOrThrow<TData>(data: TData[], errorMessage?: string) {
 }
 
 export function isEmpty<TColumn extends AnyColumn>(column: TColumn) {
+  // SQLite compatible version
   return sql<boolean>`
     case
-      when ${column} is null then true
-      when ${column} = '' then true
-      when ${column}::text = '[]' then true
-      when ${column}::text = '{}' then true
-      else false
+      when ${column} is null then 1
+      when ${column} = '' then 1
+      when ${column} = '[]' then 1
+      when ${column} = '{}' then 1
+      else 0
     end
   `;
 }

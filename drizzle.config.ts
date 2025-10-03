@@ -1,14 +1,12 @@
-import type { Config } from "drizzle-kit";
+import { defineConfig } from "drizzle-kit";
 import { env } from "@/env.js";
 
-import { databasePrefix } from "@/lib/constants";
-
-export default {
+export default defineConfig({
   schema: "./src/db/schema.ts",
-  dialect: "postgresql",
   out: "./drizzle",
+  dialect: "sqlite",
   dbCredentials: {
     url: env.DATABASE_URL,
+    ...(env.DATABASE_AUTH_TOKEN && { authToken: env.DATABASE_AUTH_TOKEN }),
   },
-  tablesFilter: [`${databasePrefix}_*`],
-} satisfies Config;
+});

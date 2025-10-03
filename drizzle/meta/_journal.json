@@ -1,5 +1,13 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1759495348977,
+      "tag": "0000_perfect_mikhail_rasputin",
+      "breakpoints": true
+    }
+  ]
 }

@@ -1,8 +1,13 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { drizzle } from "drizzle-orm/libsql";
+import { createClient } from "@libsql/client";
 import { env } from "@/env.js";
 
 import * as schema from "./schema";
 
-const client = postgres(env.DATABASE_URL);
+// Create Turso client
+const client = createClient({
+    url: env.DATABASE_URL,
+    authToken: env.DATABASE_AUTH_TOKEN,
+});
+
 export const db = drizzle(client, { schema });
