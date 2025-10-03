@@ -45,10 +45,11 @@ export const searchParamsCache = createSearchParamsCache({
   sort: getSortingStateParser<Order>().withDefault([
     { id: "createdAt", desc: true },
   ]),
-  // Basic filters
+  // Basic filters - Added custPo, removed description
   partNumber: parseAsString.withDefault(""),
   customer: parseAsString.withDefault(""),
   supplier: parseAsString.withDefault(""),
+  custPo: parseAsString.withDefault(""),
   status: parseAsArrayOf(z.enum(statusValues)).withDefault([]),
   term: parseAsArrayOf(z.enum(termValues)).withDefault([]),
   currency: parseAsArrayOf(z.enum(currencyValues)).withDefault([]),

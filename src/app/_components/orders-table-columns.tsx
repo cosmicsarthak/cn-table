@@ -7,9 +7,9 @@ import {
     DollarSign,
     Ellipsis,
     Package,
-    Text,
     User,
     Building2,
+    FileText,
 } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
@@ -122,13 +122,7 @@ export function getOrdersTableColumns({
             cell: ({ row }) => (
                 <div className="max-w-[20rem] truncate">{row.getValue("description")}</div>
             ),
-            meta: {
-                label: "Description",
-                placeholder: "Search descriptions...",
-                variant: "text",
-                icon: Text,
-            },
-            enableColumnFilter: true,
+            enableColumnFilter: false,
         },
         {
             id: "qty",
@@ -167,6 +161,13 @@ export function getOrdersTableColumns({
                 <DataTableColumnHeader column={column} title="Cust PO" />
             ),
             cell: ({ row }) => <div className="w-24">{row.getValue("custPo")}</div>,
+            meta: {
+                label: "Customer PO",
+                placeholder: "Search customer PO...",
+                variant: "text",
+                icon: FileText,
+            },
+            enableColumnFilter: true,
         },
         {
             id: "status",

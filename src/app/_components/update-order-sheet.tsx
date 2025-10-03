@@ -31,32 +31,38 @@ export function UpdateOrderSheet({ order, ...props }: UpdateOrderSheetProps) {
 
     const form = useForm<UpdateOrderSchema>({
         resolver: zodResolver(updateOrderSchema),
-        defaultValues: {
-            partNumber: order?.partNumber ?? "",
-            description: order?.description ?? "",
-            qty: order?.qty ?? 0,
-            poDate: order?.poDate ?? "",
-            term: order?.term,
-            customer: order?.customer ?? "",
-            custPo: order?.custPo ?? "",
-            status: order?.status,
-            remarks: order?.remarks ?? "",
-            currency: order?.currency,
-            poValue: order?.poValue ?? 0,
-            costs: order?.costs ?? 0,
-            customsDutyB: order?.customsDutyB ?? null,
-            freightCostC: order?.freightCostC ?? null,
-            paymentReceived: order?.paymentReceived,
-            investorPaid: order?.investorPaid,
-            targetDate: order?.targetDate ?? "",
-            dispatchDate: order?.dispatchDate ?? "",
-            supplierPoDate: order?.supplierPoDate ?? "",
-            supplier: order?.supplier ?? "",
-            supplierPo: order?.supplierPo ?? "",
-            awbToUae: order?.awbToUae ?? "",
-            stability: order?.stability ?? 10,
-        },
     });
+
+    // Update form values when order changes
+    React.useEffect(() => {
+        if (order) {
+            form.reset({
+                partNumber: order.partNumber ?? "",
+                description: order.description ?? "",
+                qty: order.qty ?? 0,
+                poDate: order.poDate ?? "",
+                term: order.term,
+                customer: order.customer ?? "",
+                custPo: order.custPo ?? "",
+                status: order.status,
+                remarks: order.remarks ?? "",
+                currency: order.currency,
+                poValue: order.poValue ?? 0,
+                costs: order.costs ?? 0,
+                customsDutyB: order.customsDutyB ?? null,
+                freightCostC: order.freightCostC ?? null,
+                paymentReceived: order.paymentReceived,
+                investorPaid: order.investorPaid,
+                targetDate: order.targetDate ?? "",
+                dispatchDate: order.dispatchDate ?? "",
+                supplierPoDate: order.supplierPoDate ?? "",
+                supplier: order.supplier ?? "",
+                supplierPo: order.supplierPo ?? "",
+                awbToUae: order.awbToUae ?? "",
+                stability: order.stability ?? 10,
+            });
+        }
+    }, [order, form]);
 
     function onSubmit(input: UpdateOrderSchema) {
         startTransition(async () => {
@@ -72,7 +78,6 @@ export function UpdateOrderSheet({ order, ...props }: UpdateOrderSheetProps) {
                 return;
             }
 
-            form.reset(input);
             props.onOpenChange?.(false);
             toast.success("Order updated");
         });
