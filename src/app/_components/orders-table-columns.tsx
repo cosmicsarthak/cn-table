@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,14 @@ interface GetOrdersTableColumnsProps {
     >;
 }
 
+// Helper function to create URL-safe slug
+function createOrderSlug(order: Order): string {
+    const sn = order.sn.toString();
+    const custPo = order.custPo.replace(/\s+/g, '-');
+    const partNumber = order.partNumber.replace(/\s+/g, '-');
+    return `${sn}-${custPo}-${partNumber}`;
+}
+
 export function getOrdersTableColumns({
                                           statusCounts,
                                           customerCounts,
@@ -73,6 +82,7 @@ export function getOrdersTableColumns({
                     onCheckedChange={(value) => row.toggleSelected(!!value)}
                     aria-label="Select row"
                     className="translate-y-0.5"
+                    onClick={(e) => e.stopPropagation()}
                 />
             ),
             enableSorting: false,
@@ -89,53 +99,7 @@ export function getOrdersTableColumns({
             enableSorting: true,
             enableHiding: false,
         },
-        {
-            id: "partNumber",
-            accessorKey: "partNumber",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Part Number" />
-            ),
-            cell: ({ row }) => {
-                return (
-                    <div className="flex items-center gap-2">
-            <span className="max-w-[12rem] truncate font-medium">
-              {row.getValue("partNumber")}
-            </span>
-                    </div>
-                );
-            },
-            meta: {
-                label: "Part Number",
-                placeholder: "Search part numbers...",
-                variant: "text",
-                icon: Package,
-            },
-            enableColumnFilter: true,
-        },
-        {
-            id: "description",
-            accessorKey: "description",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Description" />
-            ),
-            cell: ({ row }) => (
-                <div className="max-w-[20rem] truncate">{row.getValue("description")}</div>
-            ),
-            enableColumnFilter: false,
-        },
-        {
-            id: "qty",
-            accessorKey: "qty",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Qty" />
-            ),
-            cell: ({ row }) => <div className="w-16 text-right">{row.getValue("qty")}</div>,
-            meta: {
-                label: "Quantity",
-                variant: "number",
-            },
-            enableColumnFilter: true,
-        },
+
         {
             id: "customer",
             accessorKey: "customer",
@@ -159,7 +123,9 @@ export function getOrdersTableColumns({
             header: ({ column }) => (
                 <DataTableColumnHeader column={column} title="Cust PO" />
             ),
-            cell: ({ row }) => <div className="w-24">{row.getValue("custPo")}</div>,
+            cell: ({ row }) => (
+                <div className="w-24 font-medium">{row.getValue("custPo")}</div>
+            ),
             meta: {
                 label: "Customer PO",
                 placeholder: "Search customer PO...",
@@ -200,47 +166,6 @@ export function getOrdersTableColumns({
             enableColumnFilter: true,
         },
         {
-            id: "poValue",
-            accessorKey: "poValue",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="PO Value" />
-            ),
-            cell: ({ row }) => {
-                const value = row.getValue<number>("poValue");
-                const currency = row.original.currency;
-                return (
-                    <div className="w-24 text-right font-medium">
-                        {currency} {value.toFixed(2)}
-                    </div>
-                );
-            },
-            meta: {
-                label: "PO Value",
-                variant: "range",
-                range: [poValueRange.min, poValueRange.max],
-                unit: "$",
-                icon: DollarSign,
-            },
-            enableColumnFilter: true,
-        },
-        {
-            id: "supplier",
-            accessorKey: "supplier",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Supplier" />
-            ),
-            cell: ({ row }) => (
-                <div className="max-w-[12rem] truncate">{row.getValue("supplier")}</div>
-            ),
-            meta: {
-                label: "Supplier",
-                placeholder: "Search suppliers...",
-                variant: "text",
-                icon: Building2,
-            },
-            enableColumnFilter: true,
-        },
-        {
             id: "paymentReceived",
             accessorKey: "paymentReceived",
             header: ({ column }) => (
@@ -265,6 +190,66 @@ export function getOrdersTableColumns({
             enableColumnFilter: true,
         },
         {
+            id: "partNumber",
+            accessorKey: "partNumber",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Part Number" />
+            ),
+            cell: ({ row }) => {
+                return (
+                    <div className="flex items-center gap-2">
+            <span className="max-w-[12rem] truncate font-medium">
+              {row.getValue("partNumber")}
+            </span>
+                    </div>
+                );
+            },
+            meta: {
+                label: "Part Number",
+                placeholder: "Search part numbers...",
+                variant: "text",
+                icon: Package,
+            },
+            enableColumnFilter: true,
+        },
+        {
+            id: "poValue",
+            accessorKey: "poValue",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="PO Value" />
+            ),
+            cell: ({ row }) => {
+                const value = row.getValue<number>("poValue");
+                const currency = row.original.currency;
+                return (
+                    <div className="w-24 text-right font-medium">
+                        {currency} {value.toFixed(2)}
+                    </div>
+                );
+            },
+            meta: {
+                label: "PO Value",
+                variant: "range",
+                range: [poValueRange.min, poValueRange.max],
+                unit: "$",
+                icon: DollarSign,
+            },
+            enableColumnFilter: true,
+        },
+        {
+            id: "qty",
+            accessorKey: "qty",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Qty" />
+            ),
+            cell: ({ row }) => <div className="w-16 text-right">{row.getValue("qty")}</div>,
+            meta: {
+                label: "Quantity",
+                variant: "number",
+            },
+            enableColumnFilter: true,
+        },
+        {
             id: "poDate",
             accessorKey: "poDate",
             header: ({ column }) => (
@@ -273,10 +258,38 @@ export function getOrdersTableColumns({
             cell: ({ cell }) => <div className="w-24">{cell.getValue<string>()}</div>,
             meta: {
                 label: "PO Date",
-                variant: "dateRange", // Changed from "text" to "dateRange"
+                variant: "dateRange",
                 icon: CalendarIcon,
             },
             enableColumnFilter: true,
+        },
+        {
+            id: "supplier",
+            accessorKey: "supplier",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Supplier" />
+            ),
+            cell: ({ row }) => (
+                <div className="max-w-[12rem] truncate">{row.getValue("supplier")}</div>
+            ),
+            meta: {
+                label: "Supplier",
+                placeholder: "Search suppliers...",
+                variant: "text",
+                icon: Building2,
+            },
+            enableColumnFilter: true,
+        },
+        {
+            id: "description",
+            accessorKey: "description",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Description" />
+            ),
+            cell: ({ row }) => (
+                <div className="max-w-[20rem] truncate">{row.getValue("description")}</div>
+            ),
+            enableColumnFilter: false,
         },
         {
             id: "actions",
@@ -290,6 +303,7 @@ export function getOrdersTableColumns({
                                 aria-label="Open menu"
                                 variant="ghost"
                                 className="flex size-8 p-0 data-[state=open]:bg-muted"
+                                onClick={(e) => e.stopPropagation()}
                             >
                                 <Ellipsis className="size-4" aria-hidden="true" />
                             </Button>
@@ -352,6 +366,7 @@ export function getOrdersTableColumns({
                 );
             },
             size: 40,
+            enablePinning: true,
         },
     ];
 }

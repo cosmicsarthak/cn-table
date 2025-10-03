@@ -5,13 +5,13 @@ import {
     asc,
     count,
     desc,
+    eq,
     gte,
     inArray,
     like,
     lte,
     max,
     min,
-    sql,
 } from "drizzle-orm";
 import { db } from "@/db";
 import { orders } from "@/db/schema";
@@ -36,7 +36,6 @@ export async function getOrders(input: GetOrdersSchema) {
                     joinOperator: input.joinOperator,
                 });
 
-                // SQLite uses LIKE instead of ILIKE (case-insensitive search)
                 const where = advancedTable
                     ? advancedWhere
                     : and(
@@ -74,7 +73,6 @@ export async function getOrders(input: GetOrdersSchema) {
                                     : undefined,
                             )
                             : undefined,
-// In the where clause, update the poDate filter:
                         input.poDate.length > 0
                             ? and(
                                 input.poDate[0]
@@ -144,6 +142,42 @@ export async function getOrders(input: GetOrdersSchema) {
     )();
 }
 
+export async function getOrderBySlug(slug: string) {
+    return await unstable_cache(
+        async () => {
+            try {
+                // Parse the slug: sn-custPo-partNumber
+                const parts = slug.split('-');
+                if (parts.length < 3) {
+                    return null;
+                }
+
+                const sn = parseInt(parts[0]);
+                if (isNaN(sn)) {
+                    return null;
+                }
+
+                // Fetch the order by serial number
+                const order = await db
+                    .select()
+                    .from(orders)
+                    .where(eq(orders.sn, sn))
+                    .limit(1)
+                    .then((res) => res[0] ?? null);
+
+                return order;
+            } catch (_err) {
+                return null;
+            }
+        },
+        [`order-${slug}`],
+        {
+            revalidate: 60,
+            tags: ["orders"],
+        },
+    )();
+}
+
 export async function getOrderStatusCounts() {
     return unstable_cache(
         async () => {
@@ -155,8 +189,6 @@ export async function getOrderStatusCounts() {
                     })
                     .from(orders)
                     .groupBy(orders.status)
-                    // SQLite doesn't support HAVING with aggregate comparison the same way
-                    // We'll filter in JS instead
                     .then((res) =>
                         res.reduce(
                             (acc, { status, count: cnt }) => {
