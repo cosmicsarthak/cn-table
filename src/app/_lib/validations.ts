@@ -43,20 +43,19 @@ export const searchParamsCache = createSearchParamsCache({
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(10),
   sort: getSortingStateParser<Order>().withDefault([
-    { id: "createdAt", desc: true },
+    { id: "sn", desc: true },
   ]),
-  // Basic filters - Added custPo, removed description
   partNumber: parseAsString.withDefault(""),
   customer: parseAsString.withDefault(""),
   supplier: parseAsString.withDefault(""),
   custPo: parseAsString.withDefault(""),
-  status: parseAsArrayOf(z.enum(statusValues)).withDefault([]),
-  term: parseAsArrayOf(z.enum(termValues)).withDefault([]),
-  currency: parseAsArrayOf(z.enum(currencyValues)).withDefault([]),
-  paymentReceived: parseAsArrayOf(z.enum(yesNoValues)).withDefault([]),
+  status: parseAsArrayOf(z.string()).withDefault([]),
+  term: parseAsArrayOf(z.string()).withDefault([]),
+  currency: parseAsArrayOf(z.string()).withDefault([]),
+  paymentReceived: parseAsArrayOf(z.string()).withDefault([]),
   poValue: parseAsArrayOf(z.coerce.number()).withDefault([]),
-  poDate: parseAsArrayOf(z.string()).withDefault([]),
-  // Advanced filter
+  poDate: parseAsArrayOf(z.coerce.number()).withDefault([]), // Add this
+  // advanced filter
   filters: getFiltersStateParser().withDefault([]),
   joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
 });

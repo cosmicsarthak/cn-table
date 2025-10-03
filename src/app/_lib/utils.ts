@@ -125,9 +125,11 @@ export function generateRandomOrder(sn: number): Order {
   const randomDate = () => {
     const start = new Date(2024, 0, 1);
     const end = new Date(2025, 11, 31);
-    return new Date(
+    const date = new Date(
         start.getTime() + Math.random() * (end.getTime() - start.getTime())
-    ).toLocaleDateString("en-US");
+    );
+    // Format as YYYY-MM-DD
+    return date.toISOString().split('T')[0];
   };
 
   const poValue = Math.floor(Math.random() * 10000) + 100;

@@ -8,6 +8,20 @@
       "when": 1759495348977,
       "tag": "0000_perfect_mikhail_rasputin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1759503868727,
+      "tag": "0001_lame_joseph",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1759505230377,
+      "tag": "0002_spooky_radioactive_man",
+      "breakpoints": true
     }
   ]
 }

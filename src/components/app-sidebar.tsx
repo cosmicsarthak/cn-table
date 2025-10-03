@@ -63,11 +63,11 @@ const data = {
                 },
                 {
                     title: "Sales View",
-                    url: "/sales",
+                    url: "/sales?sort=[{\"id\":\"sn\",\"desc\":true}]",
                 },
                 {
                     title: "Logistics View",
-                    url: "/logistics",
+                    url: "/logistics?sort=[{\"id\":\"sn\",\"desc\":true}]",
                 },
             ],
         },

@@ -74,13 +74,26 @@ export async function getOrders(input: GetOrdersSchema) {
                                     : undefined,
                             )
                             : undefined,
+// In the where clause, update the poDate filter:
                         input.poDate.length > 0
                             ? and(
                                 input.poDate[0]
-                                    ? gte(orders.poDate, input.poDate[0])
+                                    ? gte(
+                                        orders.poDate,
+                                        (() => {
+                                            const date = new Date(input.poDate[0]);
+                                            return date.toISOString().split('T')[0];
+                                        })(),
+                                    )
                                     : undefined,
                                 input.poDate[1]
-                                    ? lte(orders.poDate, input.poDate[1])
+                                    ? lte(
+                                        orders.poDate,
+                                        (() => {
+                                            const date = new Date(input.poDate[1]);
+                                            return date.toISOString().split('T')[0];
+                                        })(),
+                                    )
                                     : undefined,
                             )
                             : undefined,

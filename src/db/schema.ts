@@ -8,7 +8,10 @@ export const orders = sqliteTable("orders", {
   partNumber: text("part_number").notNull(),
   description: text("description").notNull(),
   qty: real("qty").notNull(),
+
+  // poDate: integer("po_date", { mode: "timestamp" }).notNull(), // Recommended
   poDate: text("po_date").notNull(),
+
   term: text("term").notNull(),
   customer: text("customer").notNull(),
   custPo: text("cust_po").notNull(),

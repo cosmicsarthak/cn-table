@@ -21,6 +21,11 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { statusValues, termValues, currencyValues, yesNoValues } from "../_lib/validations";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 
 interface OrderFormProps<T extends FieldValues>
     extends Omit<React.ComponentPropsWithRef<"form">, "onSubmit"> {
@@ -141,7 +146,33 @@ export function OrderForm<T extends FieldValues>({
                             <FormItem>
                                 <FormLabel>PO Date</FormLabel>
                                 <FormControl>
-                                    <Input type="text" placeholder="12/9/2024" {...field} />
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={`w-full justify-start text-left font-normal ${
+                                                    !field.value && "text-muted-foreground"
+                                                }`}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {field.value
+                                                    ? format(new Date(field.value), "yyyy-MM-dd")
+                                                    : "Select date"}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value ? new Date(field.value) : undefined}
+                                                onSelect={(date) =>
+                                                    field.onChange(
+                                                        date ? format(date, "yyyy-MM-dd") : ""
+                                                    )
+                                                }
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -406,7 +437,33 @@ export function OrderForm<T extends FieldValues>({
                             <FormItem>
                                 <FormLabel>Supplier PO Date</FormLabel>
                                 <FormControl>
-                                    <Input type="text" placeholder="12/9/2024" {...field} />
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={`w-full justify-start text-left font-normal ${
+                                                    !field.value && "text-muted-foreground"
+                                                }`}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {field.value
+                                                    ? format(new Date(field.value), "yyyy-MM-dd")
+                                                    : "Select date"}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value ? new Date(field.value) : undefined}
+                                                onSelect={(date) =>
+                                                    field.onChange(
+                                                        date ? format(date, "yyyy-MM-dd") : ""
+                                                    )
+                                                }
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -466,7 +523,33 @@ export function OrderForm<T extends FieldValues>({
                             <FormItem>
                                 <FormLabel>Target Date</FormLabel>
                                 <FormControl>
-                                    <Input type="text" placeholder="12/31/2024" {...field} />
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={`w-full justify-start text-left font-normal ${
+                                                    !field.value && "text-muted-foreground"
+                                                }`}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {field.value
+                                                    ? format(new Date(field.value), "yyyy-MM-dd")
+                                                    : "Select date"}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value ? new Date(field.value) : undefined}
+                                                onSelect={(date) =>
+                                                    field.onChange(
+                                                        date ? format(date, "yyyy-MM-dd") : ""
+                                                    )
+                                                }
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -480,7 +563,33 @@ export function OrderForm<T extends FieldValues>({
                             <FormItem>
                                 <FormLabel>Dispatch Date</FormLabel>
                                 <FormControl>
-                                    <Input type="text" placeholder="12/31/2024" {...field} />
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={`w-full justify-start text-left font-normal ${
+                                                    !field.value && "text-muted-foreground"
+                                                }`}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {field.value
+                                                    ? format(new Date(field.value), "yyyy-MM-dd")
+                                                    : "Select date"}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value ? new Date(field.value) : undefined}
+                                                onSelect={(date) =>
+                                                    field.onChange(
+                                                        date ? format(date, "yyyy-MM-dd") : ""
+                                                    )
+                                                }
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -491,6 +600,126 @@ export function OrderForm<T extends FieldValues>({
                 {/* Additional Information */}
                 <div className="space-y-4">
                     <h3 className="text-sm font-medium text-muted-foreground">Additional</h3>
+
+                    <FormField
+                        control={form.control}
+                        name={"haInvDate" as FieldPath<T>}
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>HA Invoice Date</FormLabel>
+                                <FormControl>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={`w-full justify-start text-left font-normal ${
+                                                    !field.value && "text-muted-foreground"
+                                                }`}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {field.value
+                                                    ? format(new Date(field.value), "yyyy-MM-dd")
+                                                    : "Select date"}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value ? new Date(field.value) : undefined}
+                                                onSelect={(date) =>
+                                                    field.onChange(
+                                                        date ? format(date, "yyyy-MM-dd") : ""
+                                                    )
+                                                }
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name={"anPoDate" as FieldPath<T>}
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>AN PO Date</FormLabel>
+                                <FormControl>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={`w-full justify-start text-left font-normal ${
+                                                    !field.value && "text-muted-foreground"
+                                                }`}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {field.value
+                                                    ? format(new Date(field.value), "yyyy-MM-dd")
+                                                    : "Select date"}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value ? new Date(field.value) : undefined}
+                                                onSelect={(date) =>
+                                                    field.onChange(
+                                                        date ? format(date, "yyyy-MM-dd") : ""
+                                                    )
+                                                }
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name={"anInvDate" as FieldPath<T>}
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>AN Invoice Date</FormLabel>
+                                <FormControl>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={`w-full justify-start text-left font-normal ${
+                                                    !field.value && "text-muted-foreground"
+                                                }`}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {field.value
+                                                    ? format(new Date(field.value), "yyyy-MM-dd")
+                                                    : "Select date"}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value ? new Date(field.value) : undefined}
+                                                onSelect={(date) =>
+                                                    field.onChange(
+                                                        date ? format(date, "yyyy-MM-dd") : ""
+                                                    )
+                                                }
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
                     <FormField
                         control={form.control}

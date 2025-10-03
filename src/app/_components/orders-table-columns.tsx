@@ -273,7 +273,7 @@ export function getOrdersTableColumns({
             cell: ({ cell }) => <div className="w-24">{cell.getValue<string>()}</div>,
             meta: {
                 label: "PO Date",
-                variant: "text",
+                variant: "dateRange", // Changed from "text" to "dateRange"
                 icon: CalendarIcon,
             },
             enableColumnFilter: true,
