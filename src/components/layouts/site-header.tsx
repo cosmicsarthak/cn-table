@@ -1,44 +1,51 @@
-import { LayoutGrid } from "lucide-react";
-import Link from "next/link";
+"use client";
 
-import { Icons } from "@/components/icons";
-import { ModeToggle } from "@/components/layouts/mode-toggle";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import * as React from "react";
+import { Plus } from "lucide-react";
+
 import { siteConfig } from "@/config/site";
+import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/layouts/mode-toggle";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { CreateOrderSheet } from "@/app/_components/create-order-sheet";
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 w-full border-border/40 border-b bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60">
-      <div className="container flex h-14 items-center">
-        <Link href="/" className="mr-2 flex items-center md:mr-6 md:space-x-2">
-          <LayoutGrid className="size-4" aria-hidden="true" />
-          <span className="hidden font-bold md:inline-block">
-            {siteConfig.name}
-          </span>
-        </Link>
-        <nav className="flex w-full items-center gap-6 text-sm">
-          <Link
-            href="#"
-            rel="noopener noreferrer"
-            className="text-foreground/60 transition-colors hover:text-foreground"
-          >
-            Another View
-          </Link>
-        </nav>
-        <nav className="flex flex-1 items-center md:justify-end">
-          <Button variant="ghost" size="icon" className="size-8" asChild>
-            <Link
-              aria-label="GitHub repo"
-              href={siteConfig.links.github}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Icons.gitHub className="size-4" aria-hidden="true" />
+      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 max-w-screen-2xl items-center">
+          <div className="mr-4 flex">
+            <Link href="/" className="mr-6 flex items-center space-x-2">
+                        <span className="font-bold sm:inline-block">
+                            {siteConfig.name}
+                        </span>
             </Link>
-          </Button>
-          <ModeToggle />
-        </nav>
-      </div>
-    </header>
+            <nav className="flex items-center gap-4 text-sm lg:gap-6">
+              <Link
+                  href="/another-view"
+                  className="transition-colors hover:text-foreground/80 text-foreground/60"
+              >
+                Another View
+              </Link>
+            </nav>
+          </div>
+          <div className="flex flex-1 items-center justify-end space-x-2">
+            <nav className="flex items-center gap-2">
+              {/* Prominent Create Button */}
+              <CreateOrderSheet />
+              <ModeToggle />
+            </nav>
+          </div>
+        </div>
+      </header>
   );
 }

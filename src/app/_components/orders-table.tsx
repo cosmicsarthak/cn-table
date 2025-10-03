@@ -16,6 +16,7 @@ import type {
     getOrderStatusCounts,
     getOrders,
 } from "../_lib/queries";
+import { CreateOrderSheet } from "./create-order-sheet";
 import { DeleteOrdersDialog } from "./delete-orders-dialog";
 import { useFeatureFlags } from "./feature-flags-provider";
 import { OrdersTableActionBar } from "./orders-table-action-bar";
@@ -107,6 +108,11 @@ export function OrdersTable({ promises }: OrdersTableProps) {
                 open={rowAction?.variant === "update"}
                 onOpenChange={() => setRowAction(null)}
                 order={rowAction?.row.original ?? null}
+            />
+            <CreateOrderSheet
+                open={rowAction?.variant === "duplicate"}
+                onOpenChange={() => setRowAction(null)}
+                defaultValues={rowAction?.row.original ?? undefined}
             />
             <DeleteOrdersDialog
                 open={rowAction?.variant === "delete"}

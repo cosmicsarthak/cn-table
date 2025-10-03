@@ -22,14 +22,48 @@ import { createOrder } from "../_lib/actions";
 import type { CreateOrderSchema } from "../_lib/validations";
 import { createOrderSchema } from "../_lib/validations";
 import { OrderForm } from "./order-form";
+import type { Order } from "@/db/schema";
 
-export function CreateOrderSheet() {
+interface CreateOrderSheetProps extends React.ComponentPropsWithRef<typeof Sheet> {
+    defaultValues?: Order;
+}
+
+export function CreateOrderSheet({ defaultValues, ...props }: CreateOrderSheetProps) {
     const [open, setOpen] = React.useState(false);
     const [isPending, startTransition] = React.useTransition();
 
+    // Determine if we're using the sheet with a trigger or controlled mode
+    const isControlled = props.open !== undefined;
+    const sheetOpen = isControlled ? props.open : open;
+    const setSheetOpen = isControlled ? props.onOpenChange : setOpen;
+
     const form = useForm<CreateOrderSchema>({
         resolver: zodResolver(createOrderSchema),
-        defaultValues: {
+        defaultValues: defaultValues ? {
+            partNumber: defaultValues.partNumber ?? "",
+            description: defaultValues.description ?? "",
+            qty: defaultValues.qty ?? 1,
+            poDate: defaultValues.poDate ?? "",
+            term: defaultValues.term,
+            customer: defaultValues.customer ?? "",
+            custPo: defaultValues.custPo ?? "",
+            status: defaultValues.status,
+            remarks: defaultValues.remarks ?? "",
+            currency: defaultValues.currency,
+            poValue: defaultValues.poValue ?? 0,
+            costs: defaultValues.costs ?? 0,
+            customsDutyB: defaultValues.customsDutyB ?? null,
+            freightCostC: defaultValues.freightCostC ?? null,
+            paymentReceived: defaultValues.paymentReceived,
+            investorPaid: defaultValues.investorPaid,
+            targetDate: defaultValues.targetDate ?? "",
+            dispatchDate: defaultValues.dispatchDate ?? "",
+            supplierPoDate: defaultValues.supplierPoDate ?? "",
+            supplier: defaultValues.supplier ?? "",
+            supplierPo: defaultValues.supplierPo ?? "",
+            awbToUae: defaultValues.awbToUae ?? "",
+            stability: defaultValues.stability ?? 10,
+        } : {
             partNumber: "",
             description: "",
             qty: 1,
@@ -56,6 +90,37 @@ export function CreateOrderSheet() {
         },
     });
 
+    // Reset form when defaultValues change or sheet opens
+    React.useEffect(() => {
+        if (sheetOpen && defaultValues) {
+            form.reset({
+                partNumber: defaultValues.partNumber ?? "",
+                description: defaultValues.description ?? "",
+                qty: defaultValues.qty ?? 1,
+                poDate: defaultValues.poDate ?? "",
+                term: defaultValues.term,
+                customer: defaultValues.customer ?? "",
+                custPo: defaultValues.custPo ?? "",
+                status: defaultValues.status,
+                remarks: defaultValues.remarks ?? "",
+                currency: defaultValues.currency,
+                poValue: defaultValues.poValue ?? 0,
+                costs: defaultValues.costs ?? 0,
+                customsDutyB: defaultValues.customsDutyB ?? null,
+                freightCostC: defaultValues.freightCostC ?? null,
+                paymentReceived: defaultValues.paymentReceived,
+                investorPaid: defaultValues.investorPaid,
+                targetDate: defaultValues.targetDate ?? "",
+                dispatchDate: defaultValues.dispatchDate ?? "",
+                supplierPoDate: defaultValues.supplierPoDate ?? "",
+                supplier: defaultValues.supplier ?? "",
+                supplierPo: defaultValues.supplierPo ?? "",
+                awbToUae: defaultValues.awbToUae ?? "",
+                stability: defaultValues.stability ?? 10,
+            });
+        }
+    }, [sheetOpen, defaultValues, form]);
+
     function onSubmit(input: CreateOrderSchema) {
         startTransition(async () => {
             const { error } = await createOrder(input);
@@ -66,40 +131,59 @@ export function CreateOrderSheet() {
             }
 
             form.reset();
-            setOpen(false);
-            toast.success("Order created");
+            setSheetOpen?.(false);
+            toast.success("Order created successfully");
         });
     }
 
+    const sheetContent = (
+        <SheetContent className="flex flex-col gap-6 sm:max-w-2xl overflow-y-auto">
+            <SheetHeader className="text-left">
+                <SheetTitle>
+                    {defaultValues ? "Duplicate Order" : "Create Order"}
+                </SheetTitle>
+                <SheetDescription>
+                    {defaultValues
+                        ? "Review and modify the details to create a new order based on this one"
+                        : "Fill in the details below to create a new order"
+                    }
+                </SheetDescription>
+            </SheetHeader>
+            <OrderForm form={form} onSubmit={onSubmit}>
+                <SheetFooter className="gap-2 pt-2 sm:space-x-0">
+                    <SheetClose asChild>
+                        <Button type="button" variant="outline">
+                            Cancel
+                        </Button>
+                    </SheetClose>
+                    <Button disabled={isPending}>
+                        {isPending && <Loader className="animate-spin" />}
+                        Create
+                    </Button>
+                </SheetFooter>
+            </OrderForm>
+        </SheetContent>
+    );
+
+    // If controlled (used with duplicate), don't show trigger
+    if (isControlled) {
+        return (
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+                {sheetContent}
+            </Sheet>
+        );
+    }
+
+    // Otherwise show with trigger button
     return (
-        <Sheet open={open} onOpenChange={setOpen}>
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
                 <Button variant="outline" size="sm">
                     <Plus />
                     New order
                 </Button>
             </SheetTrigger>
-            <SheetContent className="flex flex-col gap-6 sm:max-w-2xl overflow-y-auto">
-                <SheetHeader className="text-left">
-                    <SheetTitle>Create Order</SheetTitle>
-                    <SheetDescription>
-                        Fill in the details below to create a new order
-                    </SheetDescription>
-                </SheetHeader>
-                <OrderForm form={form} onSubmit={onSubmit}>
-                    <SheetFooter className="gap-2 pt-2 sm:space-x-0">
-                        <SheetClose asChild>
-                            <Button type="button" variant="outline">
-                                Cancel
-                            </Button>
-                        </SheetClose>
-                        <Button disabled={isPending}>
-                            {isPending && <Loader className="animate-spin" />}
-                            Create
-                        </Button>
-                    </SheetFooter>
-                </OrderForm>
-            </SheetContent>
+            {sheetContent}
         </Sheet>
     );
 }

@@ -31,7 +31,6 @@ import {
     DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { type Order } from "@/db/schema";
-import { formatDate } from "@/lib/format";
 import { getErrorMessage } from "@/lib/handle-error";
 import type { DataTableRowAction } from "@/types/data-table";
 
@@ -335,6 +334,12 @@ export function getOrdersTableColumns({
                                     </DropdownMenuRadioGroup>
                                 </DropdownMenuSubContent>
                             </DropdownMenuSub>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                onSelect={() => setRowAction({ row, variant: "duplicate" })}
+                            >
+                                Duplicate
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                                 onSelect={() => setRowAction({ row, variant: "delete" })}

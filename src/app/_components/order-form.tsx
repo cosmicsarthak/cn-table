@@ -89,7 +89,11 @@ export function OrderForm<T extends FieldValues>({
                                         step="1"
                                         min="0"
                                         {...field}
-                                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                        value={field.value || ""}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            field.onChange(value === "" ? "" : Number(value));
+                                        }}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -216,7 +220,11 @@ export function OrderForm<T extends FieldValues>({
                                         step="0.01"
                                         min="0"
                                         {...field}
-                                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                        value={field.value || ""}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            field.onChange(value === "" ? "" : Number(value));
+                                        }}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -237,7 +245,11 @@ export function OrderForm<T extends FieldValues>({
                                         step="0.01"
                                         min="0"
                                         {...field}
-                                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                        value={field.value || ""}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            field.onChange(value === "" ? "" : Number(value));
+                                        }}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -259,9 +271,10 @@ export function OrderForm<T extends FieldValues>({
                                         min="0"
                                         {...field}
                                         value={field.value ?? ""}
-                                        onChange={(e) =>
-                                            field.onChange(e.target.value ? e.target.valueAsNumber : null)
-                                        }
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            field.onChange(value === "" ? null : Number(value));
+                                        }}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -283,9 +296,10 @@ export function OrderForm<T extends FieldValues>({
                                         min="0"
                                         {...field}
                                         value={field.value ?? ""}
-                                        onChange={(e) =>
-                                            field.onChange(e.target.value ? e.target.valueAsNumber : null)
-                                        }
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            field.onChange(value === "" ? null : Number(value));
+                                        }}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -510,7 +524,11 @@ export function OrderForm<T extends FieldValues>({
                                         min="0"
                                         max="10"
                                         {...field}
-                                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                        value={field.value || ""}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            field.onChange(value === "" ? "" : Number(value));
+                                        }}
                                     />
                                 </FormControl>
                                 <FormMessage />
