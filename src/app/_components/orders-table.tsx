@@ -65,7 +65,7 @@ export function OrdersTable({ promises }: OrdersTableProps) {
         enableAdvancedFilter,
         initialState: {
             sorting: [{ id: "poDate", desc: true }],
-            columnPinning: { right: ["actions"] },
+            columnPinning: { right: ["actions"], left: ["select"] },
         },
         getRowId: (originalRow) => String(originalRow.sn),
         shallow: false,

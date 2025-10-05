@@ -53,86 +53,111 @@ export function DataTable<TData>({
             {children}
             {actionBar}
             <div className="overflow-hidden rounded-md border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead
-                                            key={header.id}
-                                            colSpan={header.colSpan}
-                                            style={{
-                                                width:
-                                                    header.getSize() !== 150
-                                                        ? header.getSize()
-                                                        : undefined,
-                                            }}
-                                        >
-                                            {header.isPlaceholder
-                                                ? null
-                                                : React.createElement(
-                                                    React.Fragment,
-                                                    {},
-                                                    header.column.columnDef.header instanceof Function
-                                                        ? header.column.columnDef.header(header.getContext())
-                                                        : header.column.columnDef.header,
-                                                )}
-                                        </TableHead>
-                                    );
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                    className="hover:bg-muted/50"
-                                >
-                                    {row.getVisibleCells().map((cell) => {
-                                        const isClickable = cell.column.id === "customer" || cell.column.id === "custPo";
+                <div className="relative overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => {
+                                        const isPinned = header.column.getIsPinned();
+                                        const pinnedOffset = isPinned
+                                            ? `${header.column.getStart(isPinned)}px`
+                                            : undefined;
 
                                         return (
-                                            <TableCell
-                                                key={cell.id}
+                                            <TableHead
+                                                key={header.id}
+                                                colSpan={header.colSpan}
                                                 style={{
                                                     width:
-                                                        cell.column.getSize() !== 150
-                                                            ? cell.column.getSize()
+                                                        header.getSize() !== 150
+                                                            ? header.getSize()
                                                             : undefined,
+                                                    ...(isPinned && {
+                                                        position: "sticky",
+                                                        [isPinned]: pinnedOffset,
+                                                        zIndex: 1,
+                                                    }),
                                                 }}
                                                 className={cn(
-                                                    isClickable && "cursor-pointer hover:bg-accent"
+                                                    isPinned && "bg-background/10 backdrop-blur-md shadow-[2px_0_4px_-2px_rgba(0,0,0,0.1)]"
                                                 )}
-                                                onClick={isClickable ? () => handleRowClick(row, cell.column.id) : undefined}
                                             >
-                                                {React.createElement(
-                                                    React.Fragment,
-                                                    {},
-                                                    cell.column.columnDef.cell instanceof Function
-                                                        ? cell.column.columnDef.cell(cell.getContext())
-                                                        : cell.column.columnDef.cell,
-                                                )}
-                                            </TableCell>
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : React.createElement(
+                                                        React.Fragment,
+                                                        {},
+                                                        header.column.columnDef.header instanceof Function
+                                                            ? header.column.columnDef.header(header.getContext())
+                                                            : header.column.columnDef.header,
+                                                    )}
+                                            </TableHead>
                                         );
                                     })}
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={table.getAllColumns().length}
-                                    className="h-24 text-center"
-                                >
-                                    No results.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {table.getRowModel().rows?.length ? (
+                                table.getRowModel().rows.map((row) => (
+                                    <TableRow
+                                        key={row.id}
+                                        data-state={row.getIsSelected() && "selected"}
+                                        className="hover:bg-muted/50"
+                                    >
+                                        {row.getVisibleCells().map((cell) => {
+                                            const isClickable = cell.column.id === "customer" || cell.column.id === "custPo";
+                                            const isPinned = cell.column.getIsPinned();
+                                            const pinnedOffset = isPinned
+                                                ? `${cell.column.getStart(isPinned)}px`
+                                                : undefined;
+
+                                            return (
+                                                <TableCell
+                                                    key={cell.id}
+                                                    style={{
+                                                        width:
+                                                            cell.column.getSize() !== 150
+                                                                ? cell.column.getSize()
+                                                                : undefined,
+                                                        ...(isPinned && {
+                                                            position: "sticky",
+                                                            [isPinned]: pinnedOffset,
+                                                            zIndex: 1,
+                                                        }),
+                                                    }}
+                                                    className={cn(
+                                                        isClickable && "cursor-pointer hover:bg-accent",
+                                                        isPinned && "bg-background/10 backdrop-blur-md shadow-[2px_0_4px_-2px_rgba(0,0,0,0.1)]"
+                                                    )}
+                                                    onClick={isClickable ? () => handleRowClick(row, cell.column.id) : undefined}
+                                                >
+                                                    {React.createElement(
+                                                        React.Fragment,
+                                                        {},
+                                                        cell.column.columnDef.cell instanceof Function
+                                                            ? cell.column.columnDef.cell(cell.getContext())
+                                                            : cell.column.columnDef.cell,
+                                                    )}
+                                                </TableCell>
+                                            );
+                                        })}
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={table.getAllColumns().length}
+                                        className="h-24 text-center"
+                                    >
+                                        No results.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
             <DataTablePagination table={table} />
         </div>
