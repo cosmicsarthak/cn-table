@@ -51,6 +51,11 @@ export function UpdateOrderSheet({ order, ...props }: UpdateOrderSheetProps) {
                 costs: order.costs ?? 0,
                 customsDutyB: order.customsDutyB ?? null,
                 freightCostC: order.freightCostC ?? null,
+                // Include existing calculated values
+                grossProfit: order.grossProfit ?? null,
+                profitPercent: order.profitPercent ?? null,
+                netProfit: order.netProfit ?? null,
+                profitPercentAfterCost: order.profitPercentAfterCost ?? null,
                 paymentReceived: order.paymentReceived,
                 investorPaid: order.investorPaid,
                 targetDate: order.targetDate ?? "",
@@ -68,9 +73,26 @@ export function UpdateOrderSheet({ order, ...props }: UpdateOrderSheetProps) {
         startTransition(async () => {
             if (!order) return;
 
+            // Calculate profits before submitting
+            const poValue = input.poValue ?? order.poValue ?? 0;
+            const costs = input.costs ?? order.costs ?? 0;
+            const customsDutyB = input.customsDutyB ?? order.customsDutyB ?? 0;
+            const freightCostC = input.freightCostC ?? order.freightCostC ?? 0;
+
+            const grossProfit = poValue - costs;
+            const netProfit = poValue - (costs + freightCostC + customsDutyB);
+            const profitPercent = poValue !== 0 ? ((poValue - costs) / poValue) * 100 : 0;
+            const profitPercentAfterCost = poValue !== 0
+                ? ((poValue - (costs + freightCostC + customsDutyB)) / poValue) * 100
+                : 0;
+
             const { error } = await updateOrder({
                 sn: order.sn,
                 ...input,
+                grossProfit: parseFloat(grossProfit.toFixed(2)),
+                netProfit: parseFloat(netProfit.toFixed(2)),
+                profitPercent: parseFloat(profitPercent.toFixed(2)),
+                profitPercentAfterCost: parseFloat(profitPercentAfterCost.toFixed(2)),
             });
 
             if (error) {
@@ -89,7 +111,7 @@ export function UpdateOrderSheet({ order, ...props }: UpdateOrderSheetProps) {
                 <SheetHeader className="text-left">
                     <SheetTitle>Update Order</SheetTitle>
                     <SheetDescription>
-                        Update the order details and save the changes
+                        Update the order details and save the changes. Profit calculations will be updated automatically.
                     </SheetDescription>
                 </SheetHeader>
                 <OrderForm form={form} onSubmit={onSubmit}>

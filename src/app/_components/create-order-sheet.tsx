@@ -49,11 +49,15 @@ export function CreateOrderSheet({ defaultValues, ...props }: CreateOrderSheetPr
             custPo: defaultValues.custPo ?? "",
             status: defaultValues.status,
             remarks: defaultValues.remarks ?? "",
-            currency: defaultValues.currency,
+            currency: defaultValues.currency || "USD",
             poValue: defaultValues.poValue ?? 0,
             costs: defaultValues.costs ?? 0,
             customsDutyB: defaultValues.customsDutyB ?? null,
             freightCostC: defaultValues.freightCostC ?? null,
+            grossProfit: defaultValues.grossProfit ?? null,
+            profitPercent: defaultValues.profitPercent ?? null,
+            netProfit: defaultValues.netProfit ?? null,
+            profitPercentAfterCost: defaultValues.profitPercentAfterCost ?? null,
             paymentReceived: defaultValues.paymentReceived,
             investorPaid: defaultValues.investorPaid,
             targetDate: defaultValues.targetDate ?? "",
@@ -78,6 +82,10 @@ export function CreateOrderSheet({ defaultValues, ...props }: CreateOrderSheetPr
             costs: 0,
             customsDutyB: null,
             freightCostC: null,
+            grossProfit: null,
+            profitPercent: null,
+            netProfit: null,
+            profitPercentAfterCost: null,
             paymentReceived: "No",
             investorPaid: "No",
             targetDate: "",
@@ -103,11 +111,15 @@ export function CreateOrderSheet({ defaultValues, ...props }: CreateOrderSheetPr
                 custPo: defaultValues.custPo ?? "",
                 status: defaultValues.status,
                 remarks: defaultValues.remarks ?? "",
-                currency: defaultValues.currency,
+                currency: defaultValues.currency || "USD",
                 poValue: defaultValues.poValue ?? 0,
                 costs: defaultValues.costs ?? 0,
                 customsDutyB: defaultValues.customsDutyB ?? null,
                 freightCostC: defaultValues.freightCostC ?? null,
+                grossProfit: defaultValues.grossProfit ?? null,
+                profitPercent: defaultValues.profitPercent ?? null,
+                netProfit: defaultValues.netProfit ?? null,
+                profitPercentAfterCost: defaultValues.profitPercentAfterCost ?? null,
                 paymentReceived: defaultValues.paymentReceived,
                 investorPaid: defaultValues.investorPaid,
                 targetDate: defaultValues.targetDate ?? "",
@@ -123,7 +135,27 @@ export function CreateOrderSheet({ defaultValues, ...props }: CreateOrderSheetPr
 
     function onSubmit(input: CreateOrderSchema) {
         startTransition(async () => {
-            const { error } = await createOrder(input);
+            // Calculations are handled in the form via useEffect,
+            // but we'll also include them in the submission
+            const poValue = input.poValue || 0;
+            const costs = input.costs || 0;
+            const customsDutyB = input.customsDutyB || 0;
+            const freightCostC = input.freightCostC || 0;
+
+            const grossProfit = poValue - costs;
+            const netProfit = poValue - (costs + freightCostC + customsDutyB);
+            const profitPercent = poValue !== 0 ? ((poValue - costs) / poValue) * 100 : 0;
+            const profitPercentAfterCost = poValue !== 0
+                ? ((poValue - (costs + freightCostC + customsDutyB)) / poValue) * 100
+                : 0;
+
+            const { error } = await createOrder({
+                ...input,
+                grossProfit: parseFloat(grossProfit.toFixed(2)),
+                netProfit: parseFloat(netProfit.toFixed(2)),
+                profitPercent: parseFloat(profitPercent.toFixed(2)),
+                profitPercentAfterCost: parseFloat(profitPercentAfterCost.toFixed(2)),
+            });
 
             if (error) {
                 toast.error(error);
@@ -145,7 +177,7 @@ export function CreateOrderSheet({ defaultValues, ...props }: CreateOrderSheetPr
                 <SheetDescription>
                     {defaultValues
                         ? "Review and modify the details to create a new order based on this one"
-                        : "Fill in the details below to create a new order"
+                        : "Fill in the details below to create a new order. Profit calculations will be computed automatically."
                     }
                 </SheetDescription>
             </SheetHeader>

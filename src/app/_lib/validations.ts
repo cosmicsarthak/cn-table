@@ -54,7 +54,7 @@ export const searchParamsCache = createSearchParamsCache({
   currency: parseAsArrayOf(z.string()).withDefault([]),
   paymentReceived: parseAsArrayOf(z.string()).withDefault([]),
   poValue: parseAsArrayOf(z.coerce.number()).withDefault([]),
-  poDate: parseAsArrayOf(z.coerce.number()).withDefault([]), // Add this
+  poDate: parseAsArrayOf(z.coerce.number()).withDefault([]),
   // advanced filter
   filters: getFiltersStateParser().withDefault([]),
   joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
@@ -70,11 +70,16 @@ export const createOrderSchema = z.object({
   custPo: z.string().min(1, "Customer PO is required"),
   status: z.enum(statusValues),
   remarks: z.string().default(""),
-  currency: z.enum(currencyValues),
+  currency: z.enum(currencyValues).default("USD"),
   poValue: z.number().min(0, "PO value must be non-negative"),
   costs: z.number().min(0, "Costs must be non-negative"),
   customsDutyB: z.number().min(0).optional().nullable(),
   freightCostC: z.number().min(0).optional().nullable(),
+  // Calculated fields - optional as they're computed
+  grossProfit: z.number().optional().nullable(),
+  profitPercent: z.number().optional().nullable(),
+  netProfit: z.number().optional().nullable(),
+  profitPercentAfterCost: z.number().optional().nullable(),
   paymentReceived: z.enum(yesNoValues),
   investorPaid: z.enum(yesNoValues),
   targetDate: z.string().default(""),
@@ -101,6 +106,11 @@ export const updateOrderSchema = z.object({
   costs: z.number().min(0).optional(),
   customsDutyB: z.number().min(0).optional().nullable(),
   freightCostC: z.number().min(0).optional().nullable(),
+  // Calculated fields - optional as they're computed
+  grossProfit: z.number().optional().nullable(),
+  profitPercent: z.number().optional().nullable(),
+  netProfit: z.number().optional().nullable(),
+  profitPercentAfterCost: z.number().optional().nullable(),
   paymentReceived: z.enum(yesNoValues).optional(),
   investorPaid: z.enum(yesNoValues).optional(),
   targetDate: z.string().optional(),

@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -48,12 +47,84 @@ interface GetOrdersTableColumnsProps {
     >;
 }
 
-// Helper function to create URL-safe slug
-function createOrderSlug(order: Order): string {
-    const sn = order.sn.toString();
-    const custPo = order.custPo.replace(/\s+/g, '-');
-    const partNumber = order.partNumber.replace(/\s+/g, '-');
-    return `${sn}-${custPo}-${partNumber}`;
+// Extracted ActionsCell component to avoid hooks in dynamic cells
+function ActionsCell({
+                         row,
+                         setRowAction
+                     }: {
+    row: any;
+    setRowAction: React.Dispatch<React.SetStateAction<DataTableRowAction<Order> | null>>
+}) {
+    const [isUpdatePending, startUpdateTransition] = React.useTransition();
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button
+                    aria-label="Open menu"
+                    variant="ghost"
+                    className="flex size-8 p-0 data-[state=open]:bg-muted"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <Ellipsis className="size-4" aria-hidden="true" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem
+                    onSelect={() => setRowAction({ row, variant: "update" })}
+                >
+                    Edit
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>Status</DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className="max-h-[300px] overflow-y-auto">
+                        <DropdownMenuRadioGroup
+                            value={row.original.status}
+                            onValueChange={(value) => {
+                                startUpdateTransition(() => {
+                                    toast.promise(
+                                        updateOrder({
+                                            sn: row.original.sn,
+                                            status: value as Order["status"],
+                                        }),
+                                        {
+                                            loading: "Updating...",
+                                            success: "Status updated",
+                                            error: (err) => getErrorMessage(err),
+                                        },
+                                    );
+                                });
+                            }}
+                        >
+                            {[...statusValues].map((status) => (
+                                <DropdownMenuRadioItem
+                                    key={status}
+                                    value={status}
+                                    disabled={isUpdatePending}
+                                    className="text-xs"
+                                >
+                                    {status}
+                                </DropdownMenuRadioItem>
+                            ))}
+                        </DropdownMenuRadioGroup>
+                    </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                    onSelect={() => setRowAction({ row, variant: "duplicate" })}
+                >
+                    Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                    onSelect={() => setRowAction({ row, variant: "delete" })}
+                >
+                    Delete
+                    <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
 }
 
 export function getOrdersTableColumns({
@@ -88,6 +159,7 @@ export function getOrdersTableColumns({
             enableSorting: false,
             enableHiding: false,
             size: 40,
+            enablePinning: true,
         },
         {
             id: "sn",
@@ -98,24 +170,6 @@ export function getOrdersTableColumns({
             cell: ({ row }) => <div className="w-16">{row.getValue("sn")}</div>,
             enableSorting: true,
             enableHiding: false,
-        },
-
-        {
-            id: "customer",
-            accessorKey: "customer",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Customer" />
-            ),
-            cell: ({ row }) => (
-                <div className="max-w-[12rem] truncate">{row.getValue("customer")}</div>
-            ),
-            meta: {
-                label: "Customer",
-                placeholder: "Search customers...",
-                variant: "text",
-                icon: User,
-            },
-            enableColumnFilter: true,
         },
         {
             id: "custPo",
@@ -131,6 +185,24 @@ export function getOrdersTableColumns({
                 placeholder: "Search customer PO...",
                 variant: "text",
                 icon: FileText,
+            },
+            enableColumnFilter: true,
+            enablePinning: true,
+        },
+        {
+            id: "customer",
+            accessorKey: "customer",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Customer" />
+            ),
+            cell: ({ row }) => (
+                <div className="max-w-[12rem] truncate">{row.getValue("customer")}</div>
+            ),
+            meta: {
+                label: "Customer",
+                placeholder: "Search customers...",
+                variant: "text",
+                icon: User,
             },
             enableColumnFilter: true,
         },
@@ -198,9 +270,9 @@ export function getOrdersTableColumns({
             cell: ({ row }) => {
                 return (
                     <div className="flex items-center gap-2">
-            <span className="max-w-[12rem] truncate font-medium">
-              {row.getValue("partNumber")}
-            </span>
+                        <span className="max-w-[12rem] truncate font-medium">
+                            {row.getValue("partNumber")}
+                        </span>
                     </div>
                 );
             },
@@ -293,78 +365,7 @@ export function getOrdersTableColumns({
         },
         {
             id: "actions",
-            cell: function Cell({ row }) {
-                const [isUpdatePending, startUpdateTransition] = React.useTransition();
-
-                return (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                aria-label="Open menu"
-                                variant="ghost"
-                                className="flex size-8 p-0 data-[state=open]:bg-muted"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <Ellipsis className="size-4" aria-hidden="true" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem
-                                onSelect={() => setRowAction({ row, variant: "update" })}
-                            >
-                                Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuSub>
-                                <DropdownMenuSubTrigger>Status</DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent className="max-h-[300px] overflow-y-auto">
-                                    <DropdownMenuRadioGroup
-                                        value={row.original.status}
-                                        onValueChange={(value) => {
-                                            startUpdateTransition(() => {
-                                                toast.promise(
-                                                    updateOrder({
-                                                        sn: row.original.sn,
-                                                        status: value as Order["status"],
-                                                    }),
-                                                    {
-                                                        loading: "Updating...",
-                                                        success: "Status updated",
-                                                        error: (err) => getErrorMessage(err),
-                                                    },
-                                                );
-                                            });
-                                        }}
-                                    >
-                                        {[...statusValues].map((status) => (
-                                            <DropdownMenuRadioItem
-                                                key={status}
-                                                value={status}
-                                                disabled={isUpdatePending}
-                                                className="text-xs"
-                                            >
-                                                {status}
-                                            </DropdownMenuRadioItem>
-                                        ))}
-                                    </DropdownMenuRadioGroup>
-                                </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                                onSelect={() => setRowAction({ row, variant: "duplicate" })}
-                            >
-                                Duplicate
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                                onSelect={() => setRowAction({ row, variant: "delete" })}
-                            >
-                                Delete
-                                <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                );
-            },
+            cell: ({ row }) => <ActionsCell row={row} setRowAction={setRowAction} />,
             size: 40,
             enablePinning: true,
         },

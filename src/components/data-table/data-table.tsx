@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "./data-table-pagination";
 import type { Order } from "@/db/schema";
-import {cn} from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData> {
     table: TanStackTable<TData>;
@@ -36,13 +36,17 @@ export function DataTable<TData>({
                                  }: DataTableProps<TData>) {
     const router = useRouter();
 
-    const handleRowClick = (row: any) => {
+    const handleRowClick = React.useCallback((row: any, columnId: string) => {
+        // Only navigate if clicking on specific columns
+        const clickableColumns = ["customer", "custPo"];
+        if (!clickableColumns.includes(columnId)) return;
+
         // Check if the data has the required fields for Order
         if (row.original && 'sn' in row.original && 'custPo' in row.original && 'partNumber' in row.original) {
             const slug = createOrderSlug(row.original as Order);
             router.push(`/order/${slug}`);
         }
-    };
+    }, [router]);
 
     return (
         <div className="w-full space-y-2.5 overflow-auto">
@@ -90,13 +94,7 @@ export function DataTable<TData>({
                                 >
                                     {row.getVisibleCells().map((cell) => {
                                         const isClickable = cell.column.id === "customer" || cell.column.id === "custPo";
-                                        const cellContent = React.createElement(
-                                            React.Fragment,
-                                            {},
-                                            cell.column.columnDef.cell instanceof Function
-                                                ? cell.column.columnDef.cell(cell.getContext())
-                                                : cell.column.columnDef.cell,
-                                        );
+
                                         return (
                                             <TableCell
                                                 key={cell.id}
@@ -107,12 +105,17 @@ export function DataTable<TData>({
                                                             : undefined,
                                                 }}
                                                 className={cn(
-                                                    "cursor-pointer",
-                                                    isClickable && "hover:bg-accent"
+                                                    isClickable && "cursor-pointer hover:bg-accent"
                                                 )}
-                                                onClick={isClickable ? () => handleRowClick(row) : undefined}
+                                                onClick={isClickable ? () => handleRowClick(row, cell.column.id) : undefined}
                                             >
-                                                {cellContent}
+                                                {React.createElement(
+                                                    React.Fragment,
+                                                    {},
+                                                    cell.column.columnDef.cell instanceof Function
+                                                        ? cell.column.columnDef.cell(cell.getContext())
+                                                        : cell.column.columnDef.cell,
+                                                )}
                                             </TableCell>
                                         );
                                     })}

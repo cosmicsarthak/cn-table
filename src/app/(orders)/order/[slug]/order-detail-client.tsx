@@ -121,7 +121,7 @@ export function OrderDetailPage({ order }: OrderDetailPageProps) {
                             )}
                             {order.profitPercent !== null && (
                                 <DetailRow
-                                    label="Profit %"
+                                    label="Profit Margin(Profit %)"
                                     value={`${order.profitPercent.toFixed(2)}%`}
                                 />
                             )}

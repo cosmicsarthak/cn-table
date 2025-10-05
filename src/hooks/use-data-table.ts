@@ -261,7 +261,12 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
   const table = useReactTable({
     ...tableProps,
     columns,
-    initialState,
+    initialState: {
+      ...initialState,
+      columnPinning: {
+        right: ["actions"],
+      },
+    },
     pageCount,
     state: {
       pagination,
@@ -269,6 +274,7 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
       columnVisibility,
       rowSelection,
       columnFilters,
+      columnPinning: initialState?.columnPinning ?? { right: ["actions"] }, // ✅ include here
     },
     defaultColumn: {
       ...tableProps.defaultColumn,
@@ -290,6 +296,7 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
     manualPagination: true,
     manualSorting: true,
     manualFiltering: true,
+    enableColumnPinning: true,
   });
 
   return { table, shallow, debounceMs, throttleMs };

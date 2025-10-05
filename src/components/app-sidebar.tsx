@@ -86,21 +86,21 @@ const data = {
                 },
             ],
         },
-        {
-            title: "Documentation",
-            url: "#",
-            icon: BookOpen,
-            items: [
-                {
-                    title: "Get Started",
-                    url: "#",
-                },
-                {
-                    title: "Changelog",
-                    url: "#",
-                },
-            ],
-        },
+        // {
+        //     title: "Documentation",
+        //     url: "#",
+        //     icon: BookOpen,
+        //     items: [
+        //         {
+        //             title: "Get Started",
+        //             url: "#",
+        //         },
+        //         {
+        //             title: "Changelog",
+        //             url: "#",
+        //         },
+        //     ],
+        // },
         {
             title: "Settings",
             url: "#",
@@ -114,10 +114,10 @@ const data = {
                     title: "Team",
                     url: "#",
                 },
-                {
-                    title: "Billing",
-                    url: "#",
-                },
+                // {
+                //     title: "Billing",
+                //     url: "#",
+                // },
                 {
                     title: "Limits",
                     url: "#",

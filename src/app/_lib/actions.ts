@@ -35,7 +35,6 @@ export async function createOrder(input: CreateOrderSchema) {
     unstable_noStore();
     try {
         await db.transaction(async (tx) => {
-            // Get the next serial number
             const maxSn = await tx
                 .select({ sn: orders.sn })
                 .from(orders)
@@ -43,41 +42,31 @@ export async function createOrder(input: CreateOrderSchema) {
                 .limit(1)
                 .then((res) => res[0]?.sn ?? 0);
 
+            // Calculate profits
+            const poValue = input.poValue || 0;
+            const costs = input.costs || 0;
+            const customsDutyB = input.customsDutyB || 0;
+            const freightCostC = input.freightCostC || 0;
+
+            const grossProfit = poValue - costs;
+            const netProfit = poValue - (costs + freightCostC + customsDutyB);
+            const profitPercent = poValue !== 0 ? ((poValue - costs) / poValue) * 100 : 0;
+            const profitPercentAfterCost = poValue !== 0
+                ? ((poValue - (costs + freightCostC + customsDutyB)) / poValue) * 100
+                : 0;
+
             const newOrder = await tx
                 .insert(orders)
                 .values({
                     sn: maxSn + 1,
-                    partNumber: input.partNumber,
-                    description: input.description,
-                    qty: input.qty,
-                    poDate: input.poDate,
-                    term: input.term,
-                    customer: input.customer,
-                    custPo: input.custPo,
-                    status: input.status,
-                    remarks: input.remarks,
-                    currency: input.currency,
-                    poValue: input.poValue,
-                    costs: input.costs,
-                    customsDutyB: input.customsDutyB,
-                    freightCostC: input.freightCostC,
-                    paymentReceived: input.paymentReceived,
-                    investorPaid: input.investorPaid,
-                    targetDate: input.targetDate,
-                    dispatchDate: input.dispatchDate,
-                    supplierPoDate: input.supplierPoDate,
-                    supplier: input.supplier,
-                    supplierPo: input.supplierPo,
-                    awbToUae: input.awbToUae,
-                    stability: input.stability,
+                    ...input,
+                    grossProfit: parseFloat(grossProfit.toFixed(2)),
+                    netProfit: parseFloat(netProfit.toFixed(2)),
+                    profitPercent: parseFloat(profitPercent.toFixed(2)),
+                    profitPercentAfterCost: parseFloat(profitPercentAfterCost.toFixed(2)),
                     lastEdited: new Date().toLocaleString(),
-                    // Calculated fields
-                    grossProfit: input.poValue - input.costs,
-                    profitPercent: ((input.poValue - input.costs) / input.poValue) * 100,
                 })
-                .returning({
-                    sn: orders.sn,
-                })
+                .returning({ sn: orders.sn })
                 .then(takeFirstOrThrow);
 
             // Delete the oldest order to keep the total number constant

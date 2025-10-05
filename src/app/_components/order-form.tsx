@@ -1,6 +1,7 @@
 "use client";
 
 import type * as React from "react";
+import { useEffect } from "react";
 import type { FieldPath, FieldValues, UseFormReturn } from "react-hook-form";
 import {
     Form,
@@ -39,6 +40,33 @@ export function OrderForm<T extends FieldValues>({
                                                      onSubmit,
                                                      children,
                                                  }: OrderFormProps<T>) {
+    // Watch financial fields for automatic calculation
+    const poValue = form.watch("poValue" as FieldPath<T>);
+    const costs = form.watch("costs" as FieldPath<T>);
+    const customsDutyB = form.watch("customsDutyB" as FieldPath<T>);
+    const freightCostC = form.watch("freightCostC" as FieldPath<T>);
+
+    // Calculate profits whenever financial fields change
+    useEffect(() => {
+        const poVal = Number(poValue) || 0;
+        const costVal = Number(costs) || 0;
+        const dutyVal = Number(customsDutyB) || 0;
+        const freightVal = Number(freightCostC) || 0;
+
+        const grossProfit = poVal - costVal;
+        const netProfit = poVal - (costVal + freightVal + dutyVal);
+        const profitPercent = poVal !== 0 ? ((poVal - costVal) / poVal) * 100 : 0;
+        const profitPercentAfterCost = poVal !== 0
+            ? ((poVal - (costVal + freightVal + dutyVal)) / poVal) * 100
+            : 0;
+
+        // Update calculated fields
+        form.setValue("grossProfit" as FieldPath<T>, parseFloat(grossProfit.toFixed(2)) as any);
+        form.setValue("netProfit" as FieldPath<T>, parseFloat(netProfit.toFixed(2)) as any);
+        form.setValue("profitPercent" as FieldPath<T>, parseFloat(profitPercent.toFixed(2)) as any);
+        form.setValue("profitPercentAfterCost" as FieldPath<T>, parseFloat(profitPercentAfterCost.toFixed(2)) as any);
+    }, [poValue, costs, customsDutyB, freightCostC, form]);
+
     return (
         <Form {...form}>
             <form
@@ -217,10 +245,14 @@ export function OrderForm<T extends FieldValues>({
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Currency</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value || "USD"}
+                                    disabled
+                                >
                                     <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select currency" />
+                                        <SelectTrigger className="bg-muted">
+                                            <SelectValue placeholder="USD (Default)" />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -337,6 +369,87 @@ export function OrderForm<T extends FieldValues>({
                             </FormItem>
                         )}
                     />
+
+                    {/* Calculated Fields - Read Only */}
+                    <div className="rounded-lg border bg-muted/50 p-4 space-y-3">
+                        <p className="text-xs font-medium text-muted-foreground">Calculated Values</p>
+
+                        <FormField
+                            control={form.control}
+                            name={"grossProfit" as FieldPath<T>}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Gross Profit</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="number"
+                                            {...field}
+                                            value={field.value ?? ""}
+                                            disabled
+                                            className="bg-background"
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name={"profitPercent" as FieldPath<T>}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Profit Percent (%)</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="number"
+                                            {...field}
+                                            value={field.value ?? ""}
+                                            disabled
+                                            className="bg-background"
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name={"netProfit" as FieldPath<T>}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Net Profit</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="number"
+                                            {...field}
+                                            value={field.value ?? ""}
+                                            disabled
+                                            className="bg-background"
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name={"profitPercentAfterCost" as FieldPath<T>}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Profit Percent After Cost (%)</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="number"
+                                            {...field}
+                                            value={field.value ?? ""}
+                                            disabled
+                                            className="bg-background"
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                    </div>
                 </div>
 
                 {/* Payment Status */}
@@ -600,126 +713,6 @@ export function OrderForm<T extends FieldValues>({
                 {/* Additional Information */}
                 <div className="space-y-4">
                     <h3 className="text-sm font-medium text-muted-foreground">Additional</h3>
-
-                    <FormField
-                        control={form.control}
-                        name={"haInvDate" as FieldPath<T>}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>HA Invoice Date</FormLabel>
-                                <FormControl>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className={`w-full justify-start text-left font-normal ${
-                                                    !field.value && "text-muted-foreground"
-                                                }`}
-                                            >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                {field.value
-                                                    ? format(new Date(field.value), "yyyy-MM-dd")
-                                                    : "Select date"}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value ? new Date(field.value) : undefined}
-                                                onSelect={(date) =>
-                                                    field.onChange(
-                                                        date ? format(date, "yyyy-MM-dd") : ""
-                                                    )
-                                                }
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name={"anPoDate" as FieldPath<T>}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>AN PO Date</FormLabel>
-                                <FormControl>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className={`w-full justify-start text-left font-normal ${
-                                                    !field.value && "text-muted-foreground"
-                                                }`}
-                                            >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                {field.value
-                                                    ? format(new Date(field.value), "yyyy-MM-dd")
-                                                    : "Select date"}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value ? new Date(field.value) : undefined}
-                                                onSelect={(date) =>
-                                                    field.onChange(
-                                                        date ? format(date, "yyyy-MM-dd") : ""
-                                                    )
-                                                }
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name={"anInvDate" as FieldPath<T>}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>AN Invoice Date</FormLabel>
-                                <FormControl>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className={`w-full justify-start text-left font-normal ${
-                                                    !field.value && "text-muted-foreground"
-                                                }`}
-                                            >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                {field.value
-                                                    ? format(new Date(field.value), "yyyy-MM-dd")
-                                                    : "Select date"}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value ? new Date(field.value) : undefined}
-                                                onSelect={(date) =>
-                                                    field.onChange(
-                                                        date ? format(date, "yyyy-MM-dd") : ""
-                                                    )
-                                                }
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
 
                     <FormField
                         control={form.control}
