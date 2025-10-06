@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { FieldPath, FieldValues, UseFormReturn } from "react-hook-form";
 import {
     Form,
@@ -27,6 +27,8 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
+import { getCustomersForDropdown } from "@/app/customers/_lib/queries";
+import type { Customer } from "@/db/schema";
 
 interface OrderFormProps<T extends FieldValues>
     extends Omit<React.ComponentPropsWithRef<"form">, "onSubmit"> {
@@ -40,6 +42,24 @@ export function OrderForm<T extends FieldValues>({
                                                      onSubmit,
                                                      children,
                                                  }: OrderFormProps<T>) {
+    const [customers, setCustomers] = useState<Pick<Customer, "id" | "name">[]>([]);
+    const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
+
+    // Load customers on mount
+    useEffect(() => {
+        async function loadCustomers() {
+            try {
+                const data = await getCustomersForDropdown();
+                setCustomers(data);
+            } catch (error) {
+                console.error("Failed to load customers:", error);
+            } finally {
+                setIsLoadingCustomers(false);
+            }
+        }
+        loadCustomers();
+    }, []);
+
     // Watch financial fields for automatic calculation
     const poValue = form.watch("poValue" as FieldPath<T>);
     const costs = form.watch("costs" as FieldPath<T>);
@@ -145,9 +165,26 @@ export function OrderForm<T extends FieldValues>({
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Customer</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="TTK" {...field} />
-                                </FormControl>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                    disabled={isLoadingCustomers}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder={isLoadingCustomers ? "Loading customers..." : "Select customer"} />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            {customers.map((customer) => (
+                                                <SelectItem key={customer.id} value={customer.name}>
+                                                    {customer.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
                                 <FormMessage />
                             </FormItem>
                         )}
