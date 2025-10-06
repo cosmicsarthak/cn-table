@@ -1,12 +1,19 @@
 "use client";
 
 import * as React from "react";
+import { Plus } from "lucide-react";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTableAdvancedToolbar } from "@/components/data-table/data-table-advanced-toolbar";
 import { DataTableFilterList } from "@/components/data-table/data-table-filter-list";
 import { DataTableFilterMenu } from "@/components/data-table/data-table-filter-menu";
 import { DataTableSortList } from "@/components/data-table/data-table-sort-list";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
+import { Button } from "@/components/ui/button";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { Order, Customer } from "@/db/schema";
 import { useDataTable } from "@/hooks/use-data-table";
 import type { DataTableRowAction } from "@/types/data-table";
@@ -105,6 +112,21 @@ export function OrdersTable({ promises, customers }: OrdersTableProps) {
                     </DataTableToolbar>
                 )}
             </DataTable>
+
+            {/* Floating Action Button for Create Order */}
+            <div className="fixed bottom-6 right-6 z-50">
+                <CreateOrderSheet customers={customers}>
+                    <Button
+                        size="lg"
+                        className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                        aria-label="Create new order"
+                        title="Create new order"
+                    >
+                        <Plus className="h-6 w-6" />
+                    </Button>
+                </CreateOrderSheet>
+            </div>
+
             <UpdateOrderSheet
                 open={rowAction?.variant === "update"}
                 onOpenChange={() => setRowAction(null)}

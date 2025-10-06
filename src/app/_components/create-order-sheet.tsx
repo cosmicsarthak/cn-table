@@ -39,74 +39,45 @@ export function CreateOrderSheet({
     const [open, setOpen] = React.useState(false);
     const [isPending, startTransition] = React.useTransition();
 
-    // Determine if we're using the sheet with a trigger or controlled mode
+    // Determine the sheet state
     const isControlled = props.open !== undefined;
-    const hasCustomTrigger = Boolean(children);
     const sheetOpen = isControlled ? props.open : open;
     const setSheetOpen = isControlled ? props.onOpenChange : setOpen;
 
     const form = useForm<CreateOrderSchema>({
         resolver: zodResolver(createOrderSchema),
-        defaultValues: defaultValues ? {
-            partNumber: defaultValues.partNumber ?? "",
-            description: defaultValues.description ?? "",
-            qty: defaultValues.qty ?? 1,
-            poDate: defaultValues.poDate ?? "",
-            term: defaultValues.term,
-            customer: defaultValues.customer ?? "",
-            custPo: defaultValues.custPo ?? "",
-            status: defaultValues.status,
-            remarks: defaultValues.remarks ?? "",
-            currency: defaultValues.currency || "USD",
-            poValue: defaultValues.poValue ?? 0,
-            costs: defaultValues.costs ?? 0,
-            customsDutyB: defaultValues.customsDutyB ?? null,
-            freightCostC: defaultValues.freightCostC ?? null,
-            grossProfit: defaultValues.grossProfit ?? null,
-            profitPercent: defaultValues.profitPercent ?? null,
-            netProfit: defaultValues.netProfit ?? null,
-            profitPercentAfterCost: defaultValues.profitPercentAfterCost ?? null,
-            paymentReceived: defaultValues.paymentReceived,
-            investorPaid: defaultValues.investorPaid,
-            targetDate: defaultValues.targetDate ?? "",
-            dispatchDate: defaultValues.dispatchDate ?? "",
-            supplierPoDate: defaultValues.supplierPoDate ?? "",
-            supplier: defaultValues.supplier ?? "",
-            supplierPo: defaultValues.supplierPo ?? "",
-            awbToUae: defaultValues.awbToUae ?? "",
-            stability: defaultValues.stability ?? 10,
-        } : {
-            partNumber: "",
-            description: "",
-            qty: 1,
-            poDate: "",
-            term: "PREPAY",
-            customer: "",
-            custPo: "",
-            status: "Order yet to be processed",
-            remarks: "",
-            currency: "USD",
-            poValue: 0,
-            costs: 0,
-            customsDutyB: null,
-            freightCostC: null,
-            grossProfit: null,
-            profitPercent: null,
-            netProfit: null,
-            profitPercentAfterCost: null,
-            paymentReceived: "No",
-            investorPaid: "No",
-            targetDate: "",
-            dispatchDate: "",
-            supplierPoDate: "",
-            supplier: "",
-            supplierPo: "",
-            awbToUae: "",
-            stability: 10,
+        defaultValues: {
+            partNumber: defaultValues?.partNumber ?? "",
+            description: defaultValues?.description ?? "",
+            qty: defaultValues?.qty ?? 1,
+            poDate: defaultValues?.poDate ?? "",
+            term: defaultValues?.term ?? "PREPAY",
+            customer: defaultValues?.customer ?? "",
+            custPo: defaultValues?.custPo ?? "",
+            status: defaultValues?.status ?? "Order yet to be processed",
+            remarks: defaultValues?.remarks ?? "",
+            currency: defaultValues?.currency ?? "USD",
+            poValue: defaultValues?.poValue ?? 0,
+            costs: defaultValues?.costs ?? 0,
+            customsDutyB: defaultValues?.customsDutyB ?? null,
+            freightCostC: defaultValues?.freightCostC ?? null,
+            grossProfit: defaultValues?.grossProfit ?? null,
+            profitPercent: defaultValues?.profitPercent ?? null,
+            netProfit: defaultValues?.netProfit ?? null,
+            profitPercentAfterCost: defaultValues?.profitPercentAfterCost ?? null,
+            paymentReceived: defaultValues?.paymentReceived ?? "No",
+            investorPaid: defaultValues?.investorPaid ?? "No",
+            targetDate: defaultValues?.targetDate ?? "",
+            dispatchDate: defaultValues?.dispatchDate ?? "",
+            supplierPoDate: defaultValues?.supplierPoDate ?? "",
+            supplier: defaultValues?.supplier ?? "",
+            supplierPo: defaultValues?.supplierPo ?? "",
+            awbToUae: defaultValues?.awbToUae ?? "",
+            stability: defaultValues?.stability ?? 10,
         },
     });
 
-    // Reset form when defaultValues change or sheet opens
+    // Reset form when sheet opens with default values
     React.useEffect(() => {
         if (sheetOpen && defaultValues) {
             form.reset({
@@ -203,7 +174,7 @@ export function CreateOrderSheet({
         </SheetContent>
     );
 
-    // If controlled (used with duplicate), don't show trigger
+    // Controlled mode (for duplicate/update)
     if (isControlled) {
         return (
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -212,8 +183,8 @@ export function CreateOrderSheet({
         );
     }
 
-    // If custom trigger is provided (like FAB), use it
-    if (hasCustomTrigger) {
+    // With custom trigger (FAB or custom button)
+    if (children) {
         return (
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                 <SheetTrigger asChild>
@@ -224,7 +195,7 @@ export function CreateOrderSheet({
         );
     }
 
-    // Otherwise show default trigger button
+    // Default mode (built-in trigger)
     return (
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
