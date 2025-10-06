@@ -17,11 +17,11 @@ async function populateCustomers() {
 
         // Customer data
         const data = [
-            { name: "Alpha Distributors" },
-            { name: "Beta Logistics" },
-            { name: "Cosmic Traders" },
-            { name: "Nova Supplies" },
-            { name: "Vertex Retail" },
+            { name: "TTK" },
+            { name: "UTG" },
+            { name: "POBEDA" },
+            { name: "KARUN" },
+            { name: "S7" },
         ];
 
         await db.insert(customers).values(data);

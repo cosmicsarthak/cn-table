@@ -53,7 +53,7 @@ export function CustomerGrid({ customers }: CustomerGridProps) {
                                 {customer.orderCount} {customer.orderCount === 1 ? "order" : "orders"}
                             </Badge>
                             <span className="text-xs text-muted-foreground">
-                {new Date(customer.createdAt).toLocaleDateString()}
+                {new Date(customer.createdAt).toISOString().split("T")[0]}
               </span>
                         </div>
                     </CardContent>
