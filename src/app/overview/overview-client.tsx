@@ -19,6 +19,8 @@ import { ProgressBarProps } from "@/extra-components/ProgressBar";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { KpiDetailModalContent } from "./KpiDetailModalContent";
+import { ARModalContent } from "./ARModalContent";
+import { SPPModalContent } from "./SPPModalContent";
 import { StackedBarChartTrem } from "./StackedBarChartTrem";
 import { StackedBarChartTremGrossProfit } from "./StackedBarChartTremGrossProfit";
 import type { Order } from "@/db/schema";
@@ -26,6 +28,7 @@ import type { Order } from "@/db/schema";
 type KpiCardData = CardProps & {
     filteredOrders: Order[];
     variant?: ProgressBarProps["variant"];
+    useCustomModal?: 'ar' | 'spp';
 };
 
 interface OverviewClientProps {
@@ -163,14 +166,18 @@ export function OverviewClient({ orders }: OverviewClientProps) {
             0
         );
 
-        const supplierPendingPaymentsArray = orders.filter(
-            (o) => o.status === "Payment pending to Supplier"
+        // Supplier Pending Payments - all three categories
+        const supplierPendingArray = orders.filter(
+            (o) => o.status === "Order yet to be processed" ||
+                o.status === "Order processed" ||
+                o.status === "Payment pending to Supplier"
         );
-        const supplierPendingPayments = supplierPendingPaymentsArray.reduce(
+        const supplierPendingPayments = supplierPendingArray.reduce(
             (sum, o) => sum + o.costs,
             0
         );
 
+        // Accounts Receivable - payment not received
         const accountsReceivableArray = orders.filter(
             (o) => o.paymentReceived?.toLowerCase() !== "yes"
         );
@@ -192,7 +199,7 @@ export function OverviewClient({ orders }: OverviewClientProps) {
                         title: "Overdue",
                         current: overdueOrders,
                         allowed: orders.length,
-                        percentage: (overdueOrders / orders.length) * 100,
+                        percentage: orders.length > 0 ? (overdueOrders / orders.length) * 100 : 0,
                         unit: "n",
                     },
                 ],
@@ -204,7 +211,7 @@ export function OverviewClient({ orders }: OverviewClientProps) {
             {
                 title: "Target Date Achieved (All Time)",
                 value: targetDateAchieved.toString(),
-                valueDescription: "Delivered on or before target🛣️",
+                valueDescription: "Delivered on or before target",
                 data: [
                     {
                         title: "On-Time",
@@ -392,6 +399,7 @@ export function OverviewClient({ orders }: OverviewClientProps) {
                 filteredOrders: accountsReceivableArray,
                 ctaText: "View List",
                 variant: "error" as const,
+                useCustomModal: 'ar',
             },
             {
                 title: "Supplier Pending Payments",
@@ -410,9 +418,10 @@ export function OverviewClient({ orders }: OverviewClientProps) {
                     },
                 ],
                 ctaLink: "/?page=1&status=Payment+pending+to+Supplier",
-                filteredOrders: supplierPendingPaymentsArray,
+                filteredOrders: supplierPendingArray,
                 ctaText: "View List",
                 variant: "warning" as const,
+                useCustomModal: 'spp',
             },
             {
                 title: "Monthly On-Time Goal (Deficit/Excess)",
@@ -536,12 +545,24 @@ export function OverviewClient({ orders }: OverviewClientProps) {
                             }
                         />
                         <DialogContent className="sm:max-w-4xl">
-                            <KpiDetailModalContent
-                                title={card.title}
-                                description={card.valueDescription}
-                                orders={card.filteredOrders}
-                                ctaLink={card.ctaLink}
-                            />
+                            {card.useCustomModal === 'ar' ? (
+                                <ARModalContent
+                                    orders={card.filteredOrders}
+                                    totalAR={card.filteredOrders.reduce((sum, o) => sum + o.poValue, 0)}
+                                />
+                            ) : card.useCustomModal === 'spp' ? (
+                                <SPPModalContent
+                                    orders={card.filteredOrders}
+                                    totalSPP={card.filteredOrders.reduce((sum, o) => sum + o.costs, 0)}
+                                />
+                            ) : (
+                                <KpiDetailModalContent
+                                    title={card.title}
+                                    description={card.valueDescription}
+                                    orders={card.filteredOrders}
+                                    ctaLink={card.ctaLink}
+                                />
+                            )}
                         </DialogContent>
                     </Dialog>
                 ))}
