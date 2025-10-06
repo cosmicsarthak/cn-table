@@ -1,38 +1,32 @@
-// Run this after updating schema.ts
-// Command: pnpm drizzle-kit generate && pnpm drizzle-kit push
-
-// Then run this script to populate customers from existing orders
-// src/db/populate-customers.ts
-
-import { db } from "@/db/index";
-import { customers, orders } from "@/db/schema";
-import { sql } from "drizzle-orm";
+import { db } from "@/db";
+import { customers } from "@/db/schema";
+import { env } from "@/env.js";
 
 async function populateCustomers() {
-    console.log("🔄 Populating customers table from existing orders...");
+    console.log("🌱 Populating customers...");
 
     try {
-        // Get unique customer names from orders
-        const uniqueCustomers = await db
-            .selectDistinct({ customer: orders.customer })
-            .from(orders);
+        console.log("🔄 Connecting to database:", env.DATABASE_URL);
 
-        console.log(`Found ${uniqueCustomers.length} unique customers`);
-
-        // Insert unique customers
-        for (const { customer } of uniqueCustomers) {
-            try {
-                await db.insert(customers).values({
-                    name: customer,
-                }).onConflictDoNothing();
-
-                console.log(`✅ Added customer: ${customer}`);
-            } catch (error) {
-                console.log(`⚠️  Skipped duplicate: ${customer}`);
-            }
+        // Check for existing customers
+        const existing = await db.select().from(customers);
+        if (existing.length > 0) {
+            console.log(`✅ ${existing.length} customers already exist. Skipping population.`);
+            return;
         }
 
-        console.log("✨ Customer population complete!");
+        // Customer data
+        const data = [
+            { name: "Alpha Distributors" },
+            { name: "Beta Logistics" },
+            { name: "Cosmic Traders" },
+            { name: "Nova Supplies" },
+            { name: "Vertex Retail" },
+        ];
+
+        await db.insert(customers).values(data);
+        console.log("✅ Customers populated successfully.");
+        console.log("✨ Population complete!");
     } catch (error) {
         console.error("❌ Population failed:", error);
         throw error;

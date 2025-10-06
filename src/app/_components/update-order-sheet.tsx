@@ -15,7 +15,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet";
-import type { Order } from "@/db/schema";
+import type { Order, Customer } from "@/db/schema";
 
 import { updateOrder } from "../_lib/actions";
 import { type UpdateOrderSchema, updateOrderSchema } from "../_lib/validations";
@@ -24,9 +24,10 @@ import { OrderForm } from "./order-form";
 interface UpdateOrderSheetProps
     extends React.ComponentPropsWithRef<typeof Sheet> {
     order: Order | null;
+    customers: Pick<Customer, "id" | "name">[];
 }
 
-export function UpdateOrderSheet({ order, ...props }: UpdateOrderSheetProps) {
+export function UpdateOrderSheet({ order, customers, ...props }: UpdateOrderSheetProps) {
     const [isPending, startTransition] = React.useTransition();
 
     const form = useForm<UpdateOrderSchema>({
@@ -51,7 +52,6 @@ export function UpdateOrderSheet({ order, ...props }: UpdateOrderSheetProps) {
                 costs: order.costs ?? 0,
                 customsDutyB: order.customsDutyB ?? null,
                 freightCostC: order.freightCostC ?? null,
-                // Include existing calculated values
                 grossProfit: order.grossProfit ?? null,
                 profitPercent: order.profitPercent ?? null,
                 netProfit: order.netProfit ?? null,
@@ -73,7 +73,6 @@ export function UpdateOrderSheet({ order, ...props }: UpdateOrderSheetProps) {
         startTransition(async () => {
             if (!order) return;
 
-            // Calculate profits before submitting
             const poValue = input.poValue ?? order.poValue ?? 0;
             const costs = input.costs ?? order.costs ?? 0;
             const customsDutyB = input.customsDutyB ?? order.customsDutyB ?? 0;
@@ -114,7 +113,7 @@ export function UpdateOrderSheet({ order, ...props }: UpdateOrderSheetProps) {
                         Update the order details and save the changes. Profit calculations will be updated automatically.
                     </SheetDescription>
                 </SheetHeader>
-                <OrderForm form={form} onSubmit={onSubmit}>
+                <OrderForm form={form} onSubmit={onSubmit} customers={customers}>
                     <SheetFooter className="gap-2 pt-2 sm:space-x-0">
                         <SheetClose asChild>
                             <Button type="button" variant="outline">

@@ -7,7 +7,7 @@ import { DataTableFilterList } from "@/components/data-table/data-table-filter-l
 import { DataTableFilterMenu } from "@/components/data-table/data-table-filter-menu";
 import { DataTableSortList } from "@/components/data-table/data-table-sort-list";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
-import type { Order } from "@/db/schema";
+import type { Order, Customer } from "@/db/schema";
 import { useDataTable } from "@/hooks/use-data-table";
 import type { DataTableRowAction } from "@/types/data-table";
 import type {
@@ -32,9 +32,10 @@ interface OrdersTableProps {
             Awaited<ReturnType<typeof getPoValueRange>>,
         ]
     >;
+    customers: Pick<Customer, "id" | "name">[];
 }
 
-export function OrdersTable({ promises }: OrdersTableProps) {
+export function OrdersTable({ promises, customers }: OrdersTableProps) {
     const { enableAdvancedFilter, filterFlag } = useFeatureFlags();
 
     const [
@@ -108,11 +109,13 @@ export function OrdersTable({ promises }: OrdersTableProps) {
                 open={rowAction?.variant === "update"}
                 onOpenChange={() => setRowAction(null)}
                 order={rowAction?.row.original ?? null}
+                customers={customers}
             />
             <CreateOrderSheet
                 open={rowAction?.variant === "duplicate"}
                 onOpenChange={() => setRowAction(null)}
                 defaultValues={rowAction?.row.original ?? undefined}
+                customers={customers}
             />
             <DeleteOrdersDialog
                 open={rowAction?.variant === "delete"}

@@ -22,13 +22,14 @@ import { createOrder } from "../_lib/actions";
 import type { CreateOrderSchema } from "../_lib/validations";
 import { createOrderSchema } from "../_lib/validations";
 import { OrderForm } from "./order-form";
-import type { Order } from "@/db/schema";
+import type { Order, Customer } from "@/db/schema";
 
 interface CreateOrderSheetProps extends React.ComponentPropsWithRef<typeof Sheet> {
     defaultValues?: Order;
+    customers: Pick<Customer, "id" | "name">[];
 }
 
-export function CreateOrderSheet({ defaultValues, ...props }: CreateOrderSheetProps) {
+export function CreateOrderSheet({ defaultValues, customers, ...props }: CreateOrderSheetProps) {
     const [open, setOpen] = React.useState(false);
     const [isPending, startTransition] = React.useTransition();
 
@@ -135,8 +136,6 @@ export function CreateOrderSheet({ defaultValues, ...props }: CreateOrderSheetPr
 
     function onSubmit(input: CreateOrderSchema) {
         startTransition(async () => {
-            // Calculations are handled in the form via useEffect,
-            // but we'll also include them in the submission
             const poValue = input.poValue || 0;
             const costs = input.costs || 0;
             const customsDutyB = input.customsDutyB || 0;
@@ -181,7 +180,7 @@ export function CreateOrderSheet({ defaultValues, ...props }: CreateOrderSheetPr
                     }
                 </SheetDescription>
             </SheetHeader>
-            <OrderForm form={form} onSubmit={onSubmit}>
+            <OrderForm form={form} onSubmit={onSubmit} customers={customers}>
                 <SheetFooter className="gap-2 pt-2 sm:space-x-0">
                     <SheetClose asChild>
                         <Button type="button" variant="outline">

@@ -10,12 +10,14 @@ import { getCustomerByName, getCustomerOrders } from "../_lib/queries";
 import { CustomerOrdersTable } from "../_components/customer-orders-table";
 
 interface CustomerDetailPageProps {
-    params: {
+    params: Promise<{
         customerId: string;
-    };
+    }>;
 }
 
-export default async function CustomerDetailPage({ params }: CustomerDetailPageProps) {
+export default async function CustomerDetailPage(props: CustomerDetailPageProps) {
+    // Await params in Next.js 15
+    const params = await props.params;
     const customerName = decodeURIComponent(params.customerId);
 
     const [customer, orders] = await Promise.all([

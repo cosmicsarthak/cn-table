@@ -1,3 +1,4 @@
+// app/page.tsx
 import * as React from "react";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { Shell } from "@/components/shell";
@@ -13,6 +14,7 @@ import {
     getOrders,
 } from "./_lib/queries";
 import { searchParamsCache } from "./_lib/validations";
+import { getCustomersForDropdown } from "./customers/_lib/queries";
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>;
@@ -33,6 +35,9 @@ export default async function IndexPage(props: IndexPageProps) {
         getOrderCustomerCounts(),
         getPoValueRange(),
     ]);
+
+    // Fetch customers for the dropdown
+    const customers = await getCustomersForDropdown();
 
     return (
         <Shell className="gap-2">
@@ -58,7 +63,7 @@ export default async function IndexPage(props: IndexPageProps) {
                         />
                     }
                 >
-                    <OrdersTable promises={promises} />
+                    <OrdersTable promises={promises} customers={customers} />
                 </React.Suspense>
             </FeatureFlagsProvider>
         </Shell>

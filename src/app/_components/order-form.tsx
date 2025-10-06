@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { FieldPath, FieldValues, UseFormReturn } from "react-hook-form";
 import {
     Form,
@@ -27,7 +27,6 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { getCustomersForDropdown } from "@/app/customers/_lib/queries";
 import type { Customer } from "@/db/schema";
 
 interface OrderFormProps<T extends FieldValues>
@@ -35,30 +34,16 @@ interface OrderFormProps<T extends FieldValues>
     children: React.ReactNode;
     form: UseFormReturn<T>;
     onSubmit: (data: T) => void;
+    customers?: Pick<Customer, "id" | "name">[];
 }
 
 export function OrderForm<T extends FieldValues>({
                                                      form,
                                                      onSubmit,
                                                      children,
+                                                     customers = [],
                                                  }: OrderFormProps<T>) {
-    const [customers, setCustomers] = useState<Pick<Customer, "id" | "name">[]>([]);
-    const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
-
-    // Load customers on mount
-    useEffect(() => {
-        async function loadCustomers() {
-            try {
-                const data = await getCustomersForDropdown();
-                setCustomers(data);
-            } catch (error) {
-                console.error("Failed to load customers:", error);
-            } finally {
-                setIsLoadingCustomers(false);
-            }
-        }
-        loadCustomers();
-    }, []);
+    const isLoadingCustomers = customers.length === 0;
 
     // Watch financial fields for automatic calculation
     const poValue = form.watch("poValue" as FieldPath<T>);
