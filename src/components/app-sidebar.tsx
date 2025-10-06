@@ -35,12 +35,12 @@ const data = {
     },
     teams: [
         {
-            name: "Sarthak (Dev)",
+            name: "(Dev) Upcoming",
             logo: GalleryVerticalEnd,
             plan: "Enterprise",
         },
         {
-            name: "Hissan Aero 2",
+            name: "Hissan Aero",
             logo: AudioWaveform,
             plan: "Startup",
         },
@@ -59,7 +59,7 @@ const data = {
             items: [
                 {
                     title: "Default View",
-                    url: "#",
+                    url: "/sales",
                 },
                 {
                     title: "Sales View",

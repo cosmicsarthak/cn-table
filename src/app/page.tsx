@@ -5,16 +5,16 @@ import { Shell } from "@/components/shell";
 import { getValidFilters } from "@/lib/data-table";
 import type { SearchParams } from "@/types";
 
-import { FeatureFlagsProvider } from "./_components/feature-flags-provider";
-import { OrdersTable } from "./_components/orders-table";
+import { FeatureFlagsProvider } from "@/app/_components/feature-flags-provider";
+import { OrdersTable } from "@/app/_components/orders-table";
 import {
     getPoValueRange,
     getOrderCustomerCounts,
     getOrderStatusCounts,
     getOrders,
-} from "./_lib/queries";
-import { searchParamsCache } from "./_lib/validations";
-import { getCustomersForDropdown } from "./customers/_lib/queries";
+} from "@/app/_lib/queries";
+import { searchParamsCache } from "@/app/_lib/validations";
+import { getCustomersForDropdown } from "@/app/customers/_lib/queries";
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>;

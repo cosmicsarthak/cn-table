@@ -1,7 +1,7 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "AeroFlow",
+  name: "Hissan AeroFlow",
   description:
     "Hissan AeroFlow New Interactive Tables",
   url: "https://app.hissan-aero.com",

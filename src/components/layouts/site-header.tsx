@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import * as React from "react";
-import { Plus } from "lucide-react";
+import { Plus, ViewIcon } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
@@ -31,18 +31,24 @@ export function SiteHeader() {
             </Link>
             <nav className="flex items-center gap-4 text-sm lg:gap-6">
               <Link
-                  href="/customers"
+                  href="/view2"
                   className="transition-colors hover:text-foreground/80 text-foreground/60"
               >
-                Customers
+                View 2
               </Link>
             </nav>
           </div>
           <div className="flex flex-1 items-center justify-end space-x-2">
             <nav className="flex items-center gap-2">
-              {/* Prominent Create Button */}
-              <CreateOrderSheet customers={[]} />
-              <ModeToggle />
+              <Link
+                  href="/customers"
+                  className="transition-colors hover:text-foreground/80 text-foreground/60"
+              >
+                <Button variant="outline" size="sm">
+                  <ViewIcon />
+                  Customers
+                </Button>
+              </Link>
             </nav>
           </div>
         </div>

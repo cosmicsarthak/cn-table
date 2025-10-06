@@ -149,16 +149,16 @@ export function Sidebar() {
         )}
       >
         {/* Left: New Order Button */}
-        <Link
-          href="/new-order/products"
-          className={cx(
-            "flex items-center gap-2 rounded-xl bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:ring-offset-gray-950",
-            focusRing
-          )}
-        >
-          <RiStickyNoteAddFill className="size-4 shrink-0" />
-          New Order
-        </Link>
+        {/*<Link*/}
+        {/*  href="/new-order/products"*/}
+        {/*  className={cx(*/}
+        {/*    "flex items-center gap-2 rounded-xl bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:ring-offset-gray-950",*/}
+        {/*    focusRing*/}
+        {/*  )}*/}
+        {/*>*/}
+        {/*  <RiStickyNoteAddFill className="size-4 shrink-0" />*/}
+        {/*  New Order*/}
+        {/*</Link>*/}
 
         {/* Right: User & Menu */}
         <div className="flex items-center gap-2">

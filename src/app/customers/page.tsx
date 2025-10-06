@@ -25,7 +25,7 @@ export default async function CustomersPage() {
 
                 <div className="flex items-center gap-4">
                     <Input
-                        placeholder="Search customers..."
+                        placeholder="Search customers... 🚧WIP"
                         className="max-w-sm"
                         type="search"
                     />

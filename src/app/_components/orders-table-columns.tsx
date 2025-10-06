@@ -182,7 +182,7 @@ export function getOrdersTableColumns({
             ),
             meta: {
                 label: "Customer PO",
-                placeholder: "Search customer PO...",
+                placeholder: "Search cust PO..",
                 variant: "text",
                 icon: FileText,
             },
@@ -278,7 +278,7 @@ export function getOrdersTableColumns({
             },
             meta: {
                 label: "Part Number",
-                placeholder: "Search part numbers...",
+                placeholder: "Search part no..",
                 variant: "text",
                 icon: Package,
             },
