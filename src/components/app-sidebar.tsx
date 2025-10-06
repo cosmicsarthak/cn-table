@@ -54,7 +54,7 @@ const data = {
         {
             title: "Orders",
             url: "#",
-            icon: SquareTerminal,
+            icon: Bot,
             isActive: true,
             items: [
                 {
@@ -71,21 +71,21 @@ const data = {
                 },
             ],
         },
-        {
-            title: "Models",
-            url: "#",
-            icon: Bot,
-            items: [
-                {
-                    title: "Genesis",
-                    url: "#",
-                },
-                {
-                    title: "Explorer",
-                    url: "#",
-                },
-            ],
-        },
+        // {
+        //     title: "Models",
+        //     url: "#",
+        //     icon: Bot,
+        //     items: [
+        //         {
+        //             title: "Genesis",
+        //             url: "#",
+        //         },
+        //         {
+        //             title: "Explorer",
+        //             url: "#",
+        //         },
+        //     ],
+        // },
         // {
         //     title: "Documentation",
         //     url: "#",

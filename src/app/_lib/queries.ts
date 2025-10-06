@@ -48,6 +48,9 @@ export async function getOrders(input: GetOrdersSchema) {
                         input.supplier
                             ? like(orders.supplier, `%${input.supplier}%`)
                             : undefined,
+                        input.supplierPo
+                            ? like(orders.supplierPo, `%${input.supplierPo}%`)
+                            : undefined,
                         input.custPo
                             ? like(orders.custPo, `%${input.custPo}%`)
                             : undefined,

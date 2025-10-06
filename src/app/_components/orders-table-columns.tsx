@@ -353,6 +353,23 @@ export function getOrdersTableColumns({
             enableColumnFilter: true,
         },
         {
+            id: "supplierPo",
+            accessorKey: "supplierPo",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Supplier PO" />
+            ),
+            cell: ({ row }) => (
+                <div className="w-24 font-medium">{row.getValue("supplierPo")}</div>
+            ),
+            meta: {
+                label: "Supplier PO",
+                placeholder: "Search supplier PO...",
+                variant: "text",
+                icon: FileText,
+            },
+            enableColumnFilter: true,
+        },
+        {
             id: "description",
             accessorKey: "description",
             header: ({ column }) => (
