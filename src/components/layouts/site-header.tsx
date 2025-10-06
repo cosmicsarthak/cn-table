@@ -31,10 +31,10 @@ export function SiteHeader() {
             </Link>
             <nav className="flex items-center gap-4 text-sm lg:gap-6">
               <Link
-                  href="/another-view"
+                  href="/customers"
                   className="transition-colors hover:text-foreground/80 text-foreground/60"
               >
-                Another View
+                Customers
               </Link>
             </nav>
           </div>

@@ -11,7 +11,7 @@ import {
     Map,
     PieChart,
     Settings2,
-    SquareTerminal,
+    SquareTerminal, Users,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -132,10 +132,15 @@ const data = {
             icon: PieChart,
         },
         {
-            name: "Design Engineering",
-            url: "#",
-            icon: Frame,
+            name: "Customers", // Changed from "Another View"
+            url: "/customers",
+            icon: Users, // Make sure to import { Users } from "lucide-react"
         },
+        // {
+        //     name: "Design Engineering",
+        //     url: "#",
+        //     icon: Frame,
+        // },
         // {
         //     name: "Travel",
         //     url: "#",
