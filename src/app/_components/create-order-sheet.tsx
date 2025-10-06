@@ -27,14 +27,21 @@ import type { Order, Customer } from "@/db/schema";
 interface CreateOrderSheetProps extends React.ComponentPropsWithRef<typeof Sheet> {
     defaultValues?: Order;
     customers: Pick<Customer, "id" | "name">[];
+    children?: React.ReactNode;
 }
 
-export function CreateOrderSheet({ defaultValues, customers, ...props }: CreateOrderSheetProps) {
+export function CreateOrderSheet({
+                                     defaultValues,
+                                     customers,
+                                     children,
+                                     ...props
+                                 }: CreateOrderSheetProps) {
     const [open, setOpen] = React.useState(false);
     const [isPending, startTransition] = React.useTransition();
 
     // Determine if we're using the sheet with a trigger or controlled mode
     const isControlled = props.open !== undefined;
+    const hasCustomTrigger = Boolean(children);
     const sheetOpen = isControlled ? props.open : open;
     const setSheetOpen = isControlled ? props.onOpenChange : setOpen;
 
@@ -205,7 +212,19 @@ export function CreateOrderSheet({ defaultValues, customers, ...props }: CreateO
         );
     }
 
-    // Otherwise show with trigger button
+    // If custom trigger is provided (like FAB), use it
+    if (hasCustomTrigger) {
+        return (
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+                <SheetTrigger asChild>
+                    {children}
+                </SheetTrigger>
+                {sheetContent}
+            </Sheet>
+        );
+    }
+
+    // Otherwise show default trigger button
     return (
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>

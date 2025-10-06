@@ -41,7 +41,7 @@ export function SiteHeader() {
           <div className="flex flex-1 items-center justify-end space-x-2">
             <nav className="flex items-center gap-2">
               {/* Prominent Create Button */}
-              <CreateOrderSheet />
+              <CreateOrderSheet customers={[]} />
               <ModeToggle />
             </nav>
           </div>
